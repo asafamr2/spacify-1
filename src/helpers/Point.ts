@@ -1,33 +1,57 @@
+
 const DEG2RAD = Math.PI / 180;
+export interface Point {
+  x: number;
+  y: number;
+}
 
-export class Point {
-  constructor(public x: number, public y: number) {}
-  public add(p: Point) {
-    return new Point(this.x + p.x, this.y + p.y);
+export class PointOp {
+
+  protected constructor(protected point: Point) {}
+
+  public static onClone(p: Point) {
+    return new PointOp({ ...p });
   }
-  public sub(p: Point) {
-    return new Point(this.x - p.x, this.y - p.y);
+  public static doInline(p: Point) {
+    return new PointOp(p);
   }
-  public static zero() {
-    return new Point(0, 0);
+  // public static ONE() {
+  //   return new PointOp({ x: 1, y: 1 });
+  // }
+  // public static ZERO() {
+  //   return new PointOp({ x: 0, y: 0 });
+  // }
+
+  public static chain(opCb: (po: PointOp) => PointOp): (p: Point) => Point {
+    return (p: Point) => {
+      const pop = opCb(PointOp.onClone(p));
+      return pop.value();
+    };
+  }
+  public value(): Point {
+    return this.point;
   }
 
-  /**
-   * rotate clockwise
-   **/
-  public rotate(deg: number) {
-    const [c, s] = [Math.cos(DEG2RAD * deg), -Math.sin(DEG2RAD * deg)]; // usually rotation is counter clockwise - note minus sine
-    return new Point(this.x * c - this.y * s, this.x * s + this.y * c);
+  public add(this: PointOp, other: Point) {
+    this.point.x += other.x;
+    this.point.y += other.y;
+    return this;
   }
 
-  /**
-   *  rotate clockwise around another point 
-   **/
-  public rotateAround(deg: number, center: Point) {
-    return this.sub(center).rotate(deg).add(center);
+  public sub(this: PointOp, other: Point) {
+    this.point.x -= other.x;
+    this.point.y -= other.y;
+    return this;
   }
-
-  public mag() {
-    return Math.sqrt(this.x * this.x + this.y * this.y);
+  /***
+   * clockwise rotation in y upwards, x rightwards in degrees 
+   */
+  public rotate(this: PointOp, deg: number) {
+    const [c, s] = [Math.cos(DEG2RAD * deg), -Math.sin(DEG2RAD * deg)];
+    const current = {...this.point}
+    this.point.x = current.x * c - current.y * s
+    this.point.y = current.x * s + current.y * c 
+    return this;
   }
 }
+

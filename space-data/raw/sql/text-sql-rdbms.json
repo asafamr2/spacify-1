@@ -1,0 +1,12 @@
+{
+    "$schema": "../../schema.json",
+    "type": "scenetext",
+    "text": "SQL Nebula",
+    "arc": 0.5,
+    "rotation": -30,
+    "position": {
+      "x": 1,
+      "y": 1
+    }
+  }
+  

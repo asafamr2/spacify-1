@@ -1,0 +1,12 @@
+{
+    "$schema": "../../schema.json",
+    "uid": "text-sql-rdbms",
+    "type": "concept",
+    "wiki": "https://en.wikipedia.org/wiki/Relational_database",
+    "title": "SQL RDBMS",
+    "position": {
+      "x": 3.5,
+      "y": 3.5
+    }
+  }
+  

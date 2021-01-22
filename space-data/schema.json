@@ -1,0 +1,242 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "anyOf": [
+        {
+            "$ref": "#/definitions/concept"
+        },
+        {
+            "$ref": "#/definitions/product"
+        },
+        {
+            "$ref": "#/definitions/sceneText"
+        }
+    ],
+    "definitions": {
+        "concept": {
+            "additionalProperties": false,
+            "properties": {
+                "$schema": {
+                    "type": "string"
+                },
+                "github": {
+                    "pattern": "^https://github\\.com/.*",
+                    "type": "string"
+                },
+                "goes_with": {
+                    "items": {
+                        "$ref": "#/definitions/relation"
+                    },
+                    "type": "array"
+                },
+                "position": {
+                    "properties": {
+                        "x": {
+                            "type": "number"
+                        },
+                        "y": {
+                            "type": "number"
+                        }
+                    },
+                    "required": [
+                        "x",
+                        "y"
+                    ],
+                    "type": "object"
+                },
+                "similar": {
+                    "items": {
+                        "$ref": "#/definitions/relation"
+                    },
+                    "type": "array"
+                },
+                "title": {
+                    "description": "display in viewport and popup",
+                    "type": "string"
+                },
+                "tldr": {
+                    "type": "string"
+                },
+                "type": {
+                    "enum": [
+                        "concept"
+                    ],
+                    "type": "string"
+                },
+                "wiki": {
+                    "pattern": "^https://en\\.wikipedia\\.org/.*",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "position",
+                "type"
+            ],
+            "type": "object"
+        },
+        "product": {
+            "additionalProperties": false,
+            "properties": {
+                "$schema": {
+                    "type": "string"
+                },
+                "github": {
+                    "pattern": "^https://github\\.com/.*",
+                    "type": "string"
+                },
+                "github_stars": {
+                    "description": "Github stars, when available this number sets size",
+                    "type": "number"
+                },
+                "goes_with": {
+                    "items": {
+                        "$ref": "#/definitions/relation"
+                    },
+                    "type": "array"
+                },
+                "position": {
+                    "properties": {
+                        "x": {
+                            "type": "number"
+                        },
+                        "y": {
+                            "type": "number"
+                        }
+                    },
+                    "required": [
+                        "x",
+                        "y"
+                    ],
+                    "type": "object"
+                },
+                "similar": {
+                    "items": {
+                        "$ref": "#/definitions/relation"
+                    },
+                    "type": "array"
+                },
+                "title": {
+                    "description": "display in viewport and popup",
+                    "type": "string"
+                },
+                "tldr": {
+                    "type": "string"
+                },
+                "type": {
+                    "enum": [
+                        "product"
+                    ],
+                    "type": "string"
+                },
+                "wiki": {
+                    "pattern": "^https://en\\.wikipedia\\.org/.*",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "position",
+                "type"
+            ],
+            "type": "object"
+        },
+        "relation": {
+            "properties": {
+                "tldr": {
+                    "type": "string"
+                },
+                "tldr_link": {
+                    "type": "string"
+                },
+                "to": {
+                    "description": "Unique and short identifier used to reference this object.",
+                    "pattern": "^[a-z][a-z\\-0-9\\.]{0,31}$",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "to"
+            ],
+            "type": "object"
+        },
+        "sceneText": {
+            "additionalProperties": false,
+            "properties": {
+                "$schema": {
+                    "type": "string"
+                },
+                "arc": {
+                    "description": "1 for max. curvature, 0 means text follow a straight line",
+                    "maximum": 1,
+                    "minimum": 0,
+                    "type": "number"
+                },
+                "github": {
+                    "pattern": "^https://github\\.com/.*",
+                    "type": "string"
+                },
+                "goes_with": {
+                    "items": {
+                        "$ref": "#/definitions/relation"
+                    },
+                    "type": "array"
+                },
+                "position": {
+                    "properties": {
+                        "x": {
+                            "type": "number"
+                        },
+                        "y": {
+                            "type": "number"
+                        }
+                    },
+                    "required": [
+                        "x",
+                        "y"
+                    ],
+                    "type": "object"
+                },
+                "rotation": {
+                    "description": "clockwise rotation in degrees (-180,180)",
+                    "maximum": 180,
+                    "minimum": -180,
+                    "type": "number"
+                },
+                "similar": {
+                    "items": {
+                        "$ref": "#/definitions/relation"
+                    },
+                    "type": "array"
+                },
+                "text": {
+                    "type": "string"
+                },
+                "title": {
+                    "description": "display in viewport and popup",
+                    "type": "string"
+                },
+                "tldr": {
+                    "type": "string"
+                },
+                "type": {
+                    "description": "Github stars, when available this number sets size",
+                    "enum": [
+                        "scenetext"
+                    ],
+                    "type": "string"
+                },
+                "wiki": {
+                    "pattern": "^https://en\\.wikipedia\\.org/.*",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "arc",
+                "position",
+                "rotation",
+                "text",
+                "type"
+            ],
+            "type": "object"
+        }
+    }
+}
+

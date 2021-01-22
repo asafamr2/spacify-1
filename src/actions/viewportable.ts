@@ -51,7 +51,7 @@ export function viewportable(node: HTMLElement) {
   mc.add([pinch, pan]);
 
   let beforeMoveView = lastView;
-  let pinchCenter: HammerPoint = null;
+  let pinchCenter: HammerPoint|null = null;
   mc.on("panstart pinchstart", (ev) => {
     pinch.set({ enable: ev.type === "pinchstart" });
     pan.set({ enable: ev.type === "panstart" });
@@ -70,8 +70,8 @@ export function viewportable(node: HTMLElement) {
     const scaled =
       Math.abs(ev.scale - 1) > 1e-2
         ? getScaledView(
-            pinchCenter.x,
-            pinchCenter.y,
+            pinchCenter!.x,
+            pinchCenter!.y,
             beforeMoveView,
             1 / ev.scale
           )

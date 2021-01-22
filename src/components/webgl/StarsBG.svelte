@@ -29,6 +29,7 @@
     const ratio = 0.5;
 
     updateResolution = () => {
+      if(!container)return;
       uniforms.resolution.value.set(
         container.clientWidth * ratio,
         container.clientHeight * ratio
@@ -97,7 +98,7 @@
 
 <svelte:window
   on:resize={() => {
-    if (updateResolution) updateResolution();
+    if (updateResolution ) updateResolution();
   }} />
 
 <div id="container" bind:this={container} />

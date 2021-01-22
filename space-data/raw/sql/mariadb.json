@@ -1,0 +1,12 @@
+{
+  "$schema": "../../schema.json",
+  "type": "product",
+  "tldr": "Modern open source RDBMS",
+  "wiki": "https://en.wikipedia.org/wiki/MariaDB",
+  "github": "https://github.com/MariaDB/server",
+  "github_stars": 3600,
+  "position": {
+    "x": 1.5,
+    "y": 1.5
+  }
+}

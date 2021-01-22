@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "target": "ES2017",
+    "module": "CommonJS",
+    "emitDecoratorMetadata": true,
+    "strict": true,
+    "strictNullChecks": false,
+    "types": ["node"],
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "typeRoots" : ["./node_modules/@types","types"]
+  }
+}
