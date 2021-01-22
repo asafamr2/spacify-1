@@ -2,14 +2,15 @@
   "name": "svelte-app",
   "version": "1.0.0",
   "scripts": {
-    "compile-space-full": "ts-node --project space-data/tsconfig.json space-data/compile_space.ts -i space-data/raw -o public/build/spaceobject.json",
-    "compile-space-schema": "typescript-json-schema space-data/schema.ts --required SpaceObject > space-data/schema.json",
+    "compile-space-validate": "ts-node --project space-data/tsconfig.json space-data/compile_space.ts -i space-data/raw -o public/build/spaceobject.json",
+    "compile-space-jsonschema": "typescript-json-schema space-data/schema.ts --required SpaceObject > space-data/schema.json",
+    "compile-space-full": "npm run compile-space-jsonschema && npm run compile-space-validate",
     "build": "rollup -c",
     "dev": "rollup -c -w",
     "start": "sirv public",
     "postinstall": "husky install",
     "validate": "svelte-check",
-    "test": "jest"
+    "test": "jest && svelte-check"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^16.0.0",

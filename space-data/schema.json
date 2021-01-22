@@ -217,7 +217,6 @@
                     "type": "string"
                 },
                 "type": {
-                    "description": "Github stars, when available this number sets size",
                     "enum": [
                         "scenetext"
                     ],

@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { argv } from "process";
 import * as winston from "winston";
+import * as chalk from "chalk";
 import { Command, option } from "commander";
 import {
   getLanguageService,
@@ -75,12 +76,15 @@ async function AssertBasePathExists(filepath: string) {
 
 async function* walk(
   dir: string,
-  ext = "json"
+  ext = ["json", "md"]
 ): AsyncGenerator<string, void, void> {
   for await (const d of await fs.promises.opendir(dir)) {
     const entry = path.join(dir, d.name);
     if (d.isDirectory()) yield* walk(entry);
-    else if (d.isFile() && d.name.endsWith(ext)) yield entry;
+    if (d.isFile()) {
+      if (ext.includes(d.name.split(".").pop())) yield entry;
+      else logger.warn(`${entry} is neither markdown nor json, skipping...`);
+    } else if (d.isFile() && ext.includes(d.name.split(".").pop())) yield entry;
   }
 }
 
@@ -97,60 +101,78 @@ async function WalkAndLoad(dirpath: string) {
     .readFile(path.resolve(__dirname, "./schema.json"))
     .then((buffer) => buffer.toString("utf8"))
     .then((str) => JSON.parse(str));
+  let hadError = false;
 
   const ls = getLanguageService({});
 
-  // let validation = await ls.doValidation(testDoc.textDoc, testDoc.jsonDoc,schema);
-
   let allStuff: { [id: string]: SpaceObject } = {};
-  for await (const jsonFilePath of walk(dirpath)) {
-    logger.info(`Loading ${jsonFilePath}...`);
+  let markdowns: { [id: string]: [string, string] } = {};
+  for await (const filePath of walk(dirpath)) {
+    logger.info(`Loading ${filePath}...`);
     let so: SpaceObject;
     let textDoc: TextDocument;
     let jsonDoc: JSONDocument;
+    const uid = pathToId(filePath);
     try {
       const content = await fs.promises
-        .readFile(jsonFilePath)
+        .readFile(filePath)
         .then((buff) => buff.toString("utf8"));
-      textDoc = TextDocument.create(
-        "foo://bar/file.json",
-        "json",
-        0,
-        content
-      );
+
+      if (filePath.endsWith("md")) {
+        markdowns[uid] = [content, filePath];
+        continue;
+      }
+      so = JSON.parse(content);
+      textDoc = TextDocument.create("foo://bar/file.json", "json", 0, content);
       jsonDoc = ls.parseJSONDocument(textDoc);
     } catch (err) {
-      logger.error("Could not parse JSON: " + jsonFilePath);
+      logger.error("Could not parse JSON: " + filePath);
       continue;
+      hadError = true;
     }
-    const errors = await ls.doValidation(
-      textDoc,
-      jsonDoc,
-      undefined,
-      jsonschema
-    ).then(errs=> errs? errs.filter(err=>[1,2].includes(err.severity)):[]);
+    const errors = await ls
+      .doValidation(textDoc, jsonDoc, undefined, jsonschema)
+      .then((errs) =>
+        errs ? errs.filter((err) => [1, 2].includes(err.severity)) : []
+      );
     if (errors.length > 0) {
-        errors.forEach(err=>{
-          let msg =  ''
-          logger.error(
-            `JSON schema validation failed in ${jsonFilePath}: ${msg}`)
-        })
-        
-    };
-      // filteredErrors = filteredErrors.filter(
-      //   ((x: ErrorObject) => x.keyword.toLowerCase() !== "anyof") as any
-      // );
-      // let nonAdd = filteredErrors.filter(
-      //   (x: ErrorObject) => ["additionalProperties","required"].includes(x.keyword)
-      // );
-      // if(nonAdd.length > 0){
-      //   filteredErrors = nonAdd;
-      // }
-
-       // removes emojis
+      errors.forEach((err) => {
+        const lines = textDoc.getText().split("\n");
+        let msg =
+          lines
+            .slice(Math.max(0, err.range.end.line - 2), err.range.end.line + 1)
+            .join("\n") +
+          "\n" +
+          chalk.red(
+            Array(err.range.start.character + 1).join(" ") +
+              Array(
+                Math.max(
+                  err.range.end.character - err.range.start.character + 1,
+                  0
+                )
+              ).join("^") +
+              "    " +
+              err.message
+          );
+        logger.error(`JSON schema validation failed in ${filePath}: ${msg}`);
+      });
+      hadError = true;
       continue;
     }
-    allStuff[pathToId(jsonFilePath)] = so;
+    allStuff[uid] = so;
   }
+  for (let uid in markdowns) {
+    const [md, filepath] = markdowns[uid];
+    if (!allStuff[uid]) {
+      hadError = true;
+      logger.error(`Markdown has no matching json file ${filepath}`);
+    }
+    allStuff[uid].markdown = md;
+  }
+
+  if (hadError) {
+    throw new Error("Canceling...");
+  }
+
   return allStuff;
 }

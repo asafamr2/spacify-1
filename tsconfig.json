@@ -4,6 +4,6 @@
     "strict": true,
   },
   "extends": "@tsconfig/svelte/tsconfig.json",
-  "include": [ "src/**/*"],
+  "include": [ "src/**/*", "typings/svelte.d.ts"],
   "exclude": ["node_modules/*", "__sapper__/*", "public/*", "build-src"]
 }

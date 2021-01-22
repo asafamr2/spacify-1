@@ -3,16 +3,12 @@
 
   export let selected: SpaceObject | null;
 
-  let width;
-  let height;
-  // let parseFloat(getComputedStyle(document.documentElement).fontSize)
 </script>
 
 <div
   class="info-menu"
   class:selected={!!selected}
-  bind:clientWidth={width}
-  bind:clientHeight={height}
+  
 >
   <div class="content">
     {#if !!selected}this is the content{selected.id}{/if}

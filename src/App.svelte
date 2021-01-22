@@ -1,12 +1,12 @@
 <script lang="ts">
-	import type { Point } from "./helpers/Point";
   import { Planet, SpaceObject, SpaceText } from "./SpaceObjects";
   import { bandpass, strHash } from "./helpers/maff";
   import StarsBg from "./components/webgl/StarsBG.svelte";
   import { viewportable } from "./actions/viewportable";
   import type { View } from "./helpers/View";
   import Infotab from "./components/Infotab.svelte";
-import { onMount } from "svelte/internal";
+  import { onMount } from "svelte/internal";
+
   let spaceObjects: SpaceObject[] = [
     new Planet({ x: 10, y: 10 }, 2, "asd"),
     // new Planet({ min: new Point(11, 11), max: new Point(12, 12) }, "p2"),
@@ -62,6 +62,9 @@ import { onMount } from "svelte/internal";
   function viewchange(viewChange: CustomEvent<View>) {
     currentView = viewChange.detail;
   }
+  function setSelected(sel: any) {
+    selectedObject = sel;
+  }
 
   onMount(() => {});
 </script>
@@ -69,7 +72,6 @@ import { onMount } from "svelte/internal";
 <svelte:window
   on:contextmenu|capture|stopPropagation|preventDefault={() => false}
 />
-
 <main use:viewportable on:viewchange={viewchange}>
   {#if currentView}
     <StarsBg view={currentView} />
@@ -79,13 +81,13 @@ import { onMount } from "svelte/internal";
       on:click|self={() => (selectedObject = null)}>
       {#each getObjectsInView(spaceObjects, currentView) as so}
         {#if so?.props?.class === "planet"}
-          <circle {...so.props} on:click={() => (selectedObject = so)} />
+          <circle {...so.props} on:click={() => setSelected(so)} />
         {:else if so?.props?.class === "space-text"}
           <path id={so.pathIdent} d={so.path} style="fill:none" />
           <!-- svelte-ignore component-name-lowercase -->
           <text
             {...so.props}
-            on:click={() => (selectedObject = so)}
+            on:click={() => setSelected(so)}
             text-anchor="middle"
             style="user-select: none;">
             <textPath xlink:href={"#" + so.pathIdent} startOffset="50%">
