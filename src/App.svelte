@@ -20,8 +20,8 @@
     _view: View
   ) {
     let ret = [];
-    for (let so of Object.values(spaceObjs)) {
-      ret.push([so, SpaceObjectToSvgComponent(so),so.uid]);
+    for (let [uid,so] of Object.entries(spaceObjs)) {
+      ret.push([so, SpaceObjectToSvgComponent(so),uid]);
     }
 
     return ret;

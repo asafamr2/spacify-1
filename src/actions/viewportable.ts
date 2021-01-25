@@ -47,18 +47,18 @@ export function viewportable(node: HTMLElement) {
   const pinch = new Hammer.Pinch();
   const pan = new Hammer.Pan();
   // pinch.recognizeWith(pan);
-  //for now they are mutually exclusive
+  // for now they are mutually exclusive
   mc.add([pinch, pan]);
 
   let beforeMoveView = lastView;
-  let pinchCenter: HammerPoint|null = null;
+  let pinchCenter: HammerPoint | null = null;
   mc.on("panstart pinchstart", (ev) => {
     pinch.set({ enable: ev.type === "pinchstart" });
     pan.set({ enable: ev.type === "panstart" });
     beforeMoveView = lastView;
     pinchCenter = ev.center;
   });
-  mc.on("panend pinchend", (ev) => {
+  mc.on("panend pinchend", () => {
     pinch.set({ enable: true });
     pan.set({ enable: true });
   });

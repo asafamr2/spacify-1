@@ -37,12 +37,12 @@ function serve() {
 
 export default {
   input: "src/main.ts",
-  external: ["three"],
+  external: ["three",'hammerjs'],
 
   output: {
-    sourcemap: true,
+    sourcemap: !production,
     format: "iife",
-    globals: { three: "THREE" },
+    globals: { three: "THREE", hammer: "Hammer" },
     name: "app",
     file: "public/build/bundle.js",
   },

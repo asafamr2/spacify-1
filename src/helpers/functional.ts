@@ -5,6 +5,7 @@
  *    if not scheduled, scheduled
  *    else ignore
  */ 
+// eslint-disable-next-line @typescript-eslint/ban-types
 export const throttle = (fn: Function, ms: number) => {
   let state = 0; // 0 == run now, 1 == schedule in ms, 2 ignore
   return function (...args: any[]) {
