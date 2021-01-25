@@ -29,8 +29,9 @@
 
 <path id={pathIdent} d={svgPath} style="fill:none" />
 <text
+  font-size={saneFontSize}
   class="space-text"
-  style="text-anchor:middle;user-select: none;font-size: {saneFontSize};opacity:{opacity}">
+  style="text-anchor:middle;user-select: none;  opacity:{opacity}">
   <textPath xlink:href={"#" + pathIdent} startOffset="50%">
     {so.text}
   </textPath>

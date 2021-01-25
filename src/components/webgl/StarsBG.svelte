@@ -26,10 +26,10 @@
     };
 
     const startTime = Date.now();
-    const ratio = 0.5;
+    const ratio = window.screen.width > 1080 ? 0.5 : 1;
 
     updateResolution = () => {
-      if(!container)return;
+      if (!container) return;
       uniforms.resolution.value.set(
         container.clientWidth * ratio,
         container.clientHeight * ratio
@@ -54,6 +54,9 @@
 
     renderer = new THREE.WebGLRenderer();
 
+    const mul = 500;
+    const add = [0, 500];
+
     // renderer.setPixelRatio(window.devicePixelRatio ? window.devicePixelRatio : 1);
     renderer.setPixelRatio(ratio);
     container.appendChild(renderer.domElement);
@@ -62,10 +65,10 @@
       if (renderer) {
         uniforms.time.value = (10000 * elapsedMilliseconds) / 1000;
         uniforms.viewvec.value.set(
-          view.x,
-          -view.y - view.height,
-          view.width,
-          view.height
+          (view.x + add[0]) * mul,
+          -(view.y + add[1]) * mul - view.height * mul,
+          view.width * mul,
+          view.height * mul
         );
         renderer.render(scene, camera);
       }
@@ -85,6 +88,14 @@
   });
 </script>
 
+<svelte:window
+  on:resize={() => {
+    if (updateResolution) updateResolution();
+  }}
+/>
+
+<div id="container" bind:this={container} />
+
 <style>
   #container {
     position: absolute;
@@ -95,10 +106,3 @@
     background-color: rgb(112, 92, 101);
   }
 </style>
-
-<svelte:window
-  on:resize={() => {
-    if (updateResolution ) updateResolution();
-  }} />
-
-<div id="container" bind:this={container} />

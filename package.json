@@ -3,13 +3,12 @@
   "version": "1.0.0",
   "scripts": {
     "compile-space-validate-export": "ts-node --project space-data/tsconfig.json space-data/src/compile_space.ts -i space-data/objects -o public/build/space_objects.json",
-    "compile-space-jsonschema": "eslint space-data && typescript-json-schema space-data/schema/schema.ts --required SpaceObject > space-data/schema.json",
+    "compile-space-jsonschema": "eslint space-data && typescript-json-schema space-data/schema/schema.ts --required SpaceObject > space-data/schema/schema.json",
     "compile-space-full": "npm run compile-space-jsonschema && npm run compile-space-validate-export",
     "build": "npm run compile-space-full && npm run test && rollup -c",
     "dev": "rollup -c -w",
     "start": "sirv public",
     "postinstall": "husky install",
-    "validate": "svelte-check",
     "test": "eslint . && jest && svelte-check"
   },
   "devDependencies": {

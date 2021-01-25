@@ -15,14 +15,14 @@ import type { SpaceObject } from "../../space-data/schema/schema";
   </div>
   <div class="opener">
     <div class="spacer" />
-    <svg width="3rem" height="4rem" viewBox="0 0 3 4">
+    <svg  viewBox="0 0 3 4" style="width:3rem;height:4rem"> 
       <path
         d="M0 0 
                 a 0.5 0.5 90 0 0 0.5 0.5 
                 l 2 0 
                 a 0.5 0.5 90 0 1 0.5 0.5 
                 l 0 2 
-                a 0.5 0.5 90 0 1 -0.5 0.5
+                a 0.5 0.5 90 0 1 -0.5 0.5 
                 l -2 0
                 a 0.5 0.5 90 0 0 -0.5 0.5
                 Z"
