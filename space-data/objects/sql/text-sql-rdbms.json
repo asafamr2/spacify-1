@@ -1,5 +1,5 @@
 {
-    "$schema": "../../schema.json",
+    "$schema": "../../schema/schema.json",
     "type": "scenetext",
     "text": "SQL Nebula",
     "arc": 0.5,

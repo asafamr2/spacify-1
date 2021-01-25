@@ -9,6 +9,8 @@
     "types": ["node"],
     "moduleResolution": "node",
     "sourceMap": true,
-    "typeRoots" : ["./node_modules/@types","types"]
-  }
+    "lib": ["ES2018","ESNext","DOM"],
+    "typeRoots" : ["../node_modules/@types","typings"]
+  },
+  "include": ["./schema/*", "./src/*"]
 }

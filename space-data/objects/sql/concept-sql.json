@@ -1,5 +1,5 @@
 {
-    "$schema": "../../schema.json",
+    "$schema": "../../schema/schema.json",
     "type": "concept",
     "wiki": "https://en.wikipedia.org/wiki/Relational_database",
     "title": "SQL RDBMS",

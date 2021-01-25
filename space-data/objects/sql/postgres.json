@@ -1,10 +1,9 @@
 {
-  "$schema": "../../schema.json",
+  "$schema": "../../schema/schema.json",
   "type": "product",
   "tldr": "Powerful open source",
   "wiki": "https://en.wikipedia.org/wiki/PostgreSQL",
   "github": "https://github.com/postgres/postgres",
-  "github_stars": 7800,
   "position": {
     "x": 2,
     "y": 2

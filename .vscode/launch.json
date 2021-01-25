@@ -10,7 +10,7 @@
             "request": "launch",
             "runtimeExecutable": "node",
             "runtimeArgs": ["--nolazy", "-r", "ts-node/register/transpile-only"],
-            "args": ["compile_space.ts","-i","raw","-o","../public/build/spaceopbject.json"],
+            "args": ["src/compile_space.ts","-i","objects","-o","../public/build/spaceopbject.json"],
             "cwd": "${workspaceRoot}/space-data",
             "console": "integratedTerminal",
             "internalConsoleOptions": "openOnFirstSessionStart",

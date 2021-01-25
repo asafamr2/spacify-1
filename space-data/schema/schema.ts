@@ -1,11 +1,11 @@
 /**
  * @description Unique and short identifier used to reference this object.
- * @pattern "^[a-z][a-z\\-0-9\\.]{0,31}$"
+ * @pattern "^[a-z0-9\/]*$"
  */
 export type uid = string;
 
 interface relation {
-  to: uid;
+  ref: uid;
   tldr?: string;
   tldr_link?: string;
 }
@@ -16,7 +16,7 @@ interface common_props {
   /**
    * @ignore
    */
-  _filename: string;
+  uid: uid;
 
   /**
    * @description display in viewport and popup
@@ -62,7 +62,7 @@ export interface product extends common_props {
   type: "product";
 
   /**
-   * @description Github stars, when available this number sets size
+   * @ignore Github stars (in stats), sets object size
    */
   github_stars?: number;
 }
