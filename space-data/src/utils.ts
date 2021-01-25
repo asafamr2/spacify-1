@@ -14,7 +14,7 @@ export async function* walkDir(
       if (d.isFile()) {
         if (ext.includes(d.name.split(".").pop())) yield entry;
         else logger.warn(`${entry} is neither markdown nor json, skipping...`);
-      } else if (d.isFile() && ext.includes(d.name.split(".").pop())) yield entry;
+      } 
     }
   }
 

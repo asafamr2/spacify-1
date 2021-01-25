@@ -122,6 +122,7 @@ export class SpaceObjectLoader {
       );
 
     if (errors.length === 0) {
+      delete so.$schema;
       return so;
     }
 

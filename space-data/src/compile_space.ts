@@ -1,16 +1,20 @@
 import { argv, exit } from "process";
 import { Command } from "commander";
 import { logger, assertBasePathExists } from "./utils";
-import { SpaceObject } from "../schema/schema";
-import { SpaceObjectLoader } from "./object_loading";
-
+import { SpaceObjectLoader } from "./object_loader";
+import * as fs from "fs";
 
 main(argv)
   .then(() => {
     logger.info("Done.");
   })
   .catch((err) => {
-    const errorStr = err instanceof Error? err.stack? err.stack:err.message:String(err) ;
+    const errorStr =
+      err instanceof Error
+        ? err.stack
+          ? err.stack
+          : err.message
+        : String(err);
     logger.error(errorStr);
     exit(1);
   });
@@ -32,13 +36,19 @@ async function main(argv: string[]) {
     .requiredOption("-o, --output-path <filepath>", "Output JSON path");
   command.parse(argv);
 
-  const parsedOptions = command.opts();
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const parsedOptions: {
+    loglevel: string;
+    outputPath: string;
+    inputDir: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } = command.opts() as any;
   logger.transports[0].level = parsedOptions.loglevel;
   await assertBasePathExists(parsedOptions.outputPath);
   const loader = new SpaceObjectLoader(parsedOptions.inputDir);
-  const objects = await loader.load()
-    
+  const objects = await loader.load();
 
-  
+  await fs.promises
+    .writeFile(parsedOptions.outputPath, JSON.stringify(objects))
+    .describeFailure("Could not write SpaceObjects to file");
 }
