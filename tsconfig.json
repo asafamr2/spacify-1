@@ -2,8 +2,9 @@
   "compilerOptions": {
     "experimentalDecorators": true,
     "strict": true,
+    "types": ["svelte"]
   },
   "extends": "@tsconfig/svelte/tsconfig.json",
-  "include": [ "src/**/*", "typings/svelte.d.ts"],
-  "exclude": ["node_modules/*", "__sapper__/*", "public/*", "build-src"]
+  "include": [ "src/**/*", "typings/svelte.d.ts","space-data/schema/*"],
+  "exclude": ["node_modules/*", "__sapper__/*", "public/*", "space-data/src"]
 }

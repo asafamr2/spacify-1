@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { SpaceObject } from "../SpaceObjects";
+import type { SpaceObject } from "../../space-data/schema/schema";
 
   export let selected: SpaceObject | null;
 
@@ -11,7 +11,7 @@
   
 >
   <div class="content">
-    {#if !!selected}this is the content{selected.id}{/if}
+    {#if !!selected}this is the content{selected.uid}{/if}
   </div>
   <div class="opener">
     <div class="spacer" />

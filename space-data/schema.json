@@ -2,17 +2,17 @@
     "$schema": "http://json-schema.org/draft-07/schema#",
     "anyOf": [
         {
-            "$ref": "#/definitions/concept"
+            "$ref": "#/definitions/Concept"
         },
         {
-            "$ref": "#/definitions/product"
+            "$ref": "#/definitions/Product"
         },
         {
-            "$ref": "#/definitions/sceneText"
+            "$ref": "#/definitions/SceneText"
         }
     ],
     "definitions": {
-        "concept": {
+        "Concept": {
             "additionalProperties": false,
             "properties": {
                 "$schema": {
@@ -73,7 +73,7 @@
             ],
             "type": "object"
         },
-        "product": {
+        "Product": {
             "additionalProperties": false,
             "properties": {
                 "$schema": {
@@ -134,26 +134,7 @@
             ],
             "type": "object"
         },
-        "relation": {
-            "properties": {
-                "ref": {
-                    "description": "Unique and short identifier used to reference this object.",
-                    "pattern": "^[a-z0-9/]*$",
-                    "type": "string"
-                },
-                "tldr": {
-                    "type": "string"
-                },
-                "tldr_link": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "ref"
-            ],
-            "type": "object"
-        },
-        "sceneText": {
+        "SceneText": {
             "additionalProperties": false,
             "properties": {
                 "$schema": {
@@ -202,6 +183,9 @@
                     },
                     "type": "array"
                 },
+                "size": {
+                    "type": "number"
+                },
                 "text": {
                     "type": "string"
                 },
@@ -227,8 +211,28 @@
                 "arc",
                 "position",
                 "rotation",
+                "size",
                 "text",
                 "type"
+            ],
+            "type": "object"
+        },
+        "relation": {
+            "properties": {
+                "ref": {
+                    "description": "Unique and short identifier used to reference this object.",
+                    "pattern": "^[a-z0-9/]*$",
+                    "type": "string"
+                },
+                "tldr": {
+                    "type": "string"
+                },
+                "tldr_link": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "ref"
             ],
             "type": "object"
         }

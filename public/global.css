@@ -9,6 +9,11 @@ body {
   -ms-text-size-adjust: none;
 }
 
+.product {
+  fill: #d6a265;
+  cursor: pointer;
+}
+
 body {
   color: #333;
   margin: 0;

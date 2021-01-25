@@ -52,13 +52,13 @@ interface common_props {
 /**
  * @additionalProperties false
  */
-export interface concept extends common_props {
+export interface Concept extends common_props {
   type: "concept";
 }
 /**
  * @additionalProperties false
  */
-export interface product extends common_props {
+export interface Product extends common_props {
   type: "product";
 
   /**
@@ -70,8 +70,9 @@ export interface product extends common_props {
 /**
  * @additionalProperties false
  */
-export interface sceneText extends common_props {
+export interface SceneText extends common_props {
   type: "scenetext";
+  size: number;
   text: string;
 
   /**
@@ -89,4 +90,4 @@ export interface sceneText extends common_props {
   rotation: number;
 }
 
-export type SpaceObject = sceneText | concept | product;
+export type SpaceObject = SceneText | Concept | Product;

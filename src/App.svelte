@@ -1,61 +1,29 @@
 <script lang="ts">
-  import { Planet, SpaceObject, SpaceText } from "./SpaceObjects";
-  import { bandpass, strHash } from "./helpers/maff";
+  import type { SpaceObject } from "../space-data/schema/schema";
   import StarsBg from "./components/webgl/StarsBG.svelte";
   import { viewportable } from "./actions/viewportable";
   import type { View } from "./helpers/View";
   import Infotab from "./components/Infotab.svelte";
   import { onMount } from "svelte/internal";
-
-  let spaceObjects: SpaceObject[] = [
-    new Planet({ x: 10, y: 10 }, 2, "asd"),
-    // new Planet({ min: new Point(11, 11), max: new Point(12, 12) }, "p2"),
-    new SpaceText(
-      "Hola!",
-      { x: 11, y: 11 },
-      /*size*/ 20,
-      /*rotation*/ -30,
-      /*curve*/ 0.3,
-      "ttt"
-    ),
-  ];
+  import { SpaceObjectToSvgComponent } from "./components/spaceobjects/mapping";
 
   let currentView: View | null = null;
   let selectedObject: SpaceObject | null = null;
+  let spaceObjects: { [uid: string]: SpaceObject } = {};
 
-  fetch(`test.json`)
+  fetch(`build/space_objects.json`)
     .then((r) => r.json())
-    .then((js) => console.log(js));
+    .then((json) => (spaceObjects = json));
 
-  function getObjectsInView(spaceObjs: SpaceObject[], view: View) {
+  function getObjectsInView(
+    spaceObjs: { [uid: string]: SpaceObject },
+    _view: View
+  ) {
     let ret = [];
-    for (let so of spaceObjs) {
-      if (so instanceof Planet) {
-        ret.push({
-          props: {
-            cx: so.center.x,
-            cy: so.center.y,
-            r: so.radius,
-            class: "planet",
-            opacity: bandpass([0, 0.001, 0.2, 0.6], so.radius / view.width),
-          },
-        });
-      } else if (so instanceof SpaceText) {
-        ret.push({
-          props: {
-            class: "space-text",
-            "font-size": so.saneFontSize,
-            opacity: bandpass(
-              [0, 0.01, 0.2, 0.5],
-              so.saneFontSize / view.width
-            ),
-          },
-          path: so.path,
-          text: so.text,
-          pathIdent: "p" + strHash(so.path),
-        });
-      }
+    for (let so of Object.values(spaceObjs)) {
+      ret.push([so, SpaceObjectToSvgComponent(so),so.uid]);
     }
+
     return ret;
   }
 
@@ -63,6 +31,7 @@
     currentView = viewChange.detail;
   }
   function setSelected(sel: any) {
+    console.log(sel)
     selectedObject = sel;
   }
 
@@ -73,28 +42,16 @@
   on:contextmenu|capture|stopPropagation|preventDefault={() => false}
 />
 <main use:viewportable on:viewchange={viewchange}>
-  {#if currentView}
+  {#if currentView && Object.keys(spaceObjects).length}
     <StarsBg view={currentView} />
     <svg
       class="svgboard"
       viewBox={currentView.toSvgString()}
       on:click|self={() => (selectedObject = null)}>
-      {#each getObjectsInView(spaceObjects, currentView) as so}
-        {#if so?.props?.class === "planet"}
-          <circle {...so.props} on:click={() => setSelected(so)} />
-        {:else if so?.props?.class === "space-text"}
-          <path id={so.pathIdent} d={so.path} style="fill:none" />
-          <!-- svelte-ignore component-name-lowercase -->
-          <text
-            {...so.props}
-            on:click={() => setSelected(so)}
-            text-anchor="middle"
-            style="user-select: none;">
-            <textPath xlink:href={"#" + so.pathIdent} startOffset="50%">
-              {so.text}
-            </textPath>
-          </text>
-        {/if}
+      {#each getObjectsInView(spaceObjects, currentView) as so (so[2])}
+        <g on:click={()=>setSelected(so[0])}>
+        <svelte:component  so={so[0]} this={so[1]} view={currentView} />
+      </g>
       {/each}
     </svg>
     <Infotab selected={selectedObject} />
@@ -111,10 +68,7 @@
   /* svg {
 		/* background-color: #402641; 
 	} */
-  .planet {
-    fill: #d6a265;
-    cursor: pointer;
-  }
+  
   .svgboard {
     position: absolute;
     top: 0;
