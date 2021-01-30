@@ -30,7 +30,4 @@ it("softclamps", () => {
   expect(softClamp(-100, [0, 100])).toBeGreaterThan(0);
   expect(softClamp(0.9, [0, 1])).toBeCloseTo(0.9, 4);
   expect(softClamp(-100, [-150, 50])).toBe(-100);
-  for (let i = 0; i < 100; i++) {
-    console.log(i, softClamp(i, [30, 90]));
-  }
 });
