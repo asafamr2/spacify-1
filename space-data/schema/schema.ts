@@ -4,13 +4,16 @@
  */
 export type uid = string;
 
+type SOTag = "LEADER" | "OPEN_SOURCE" | "FREE" | "TRENDING";
+
 interface relation {
   ref: uid;
-  tldr?: string;
-  tldr_link?: string;
 }
 
 interface common_props {
+  /**
+   * for json schema
+   */
   $schema?: string;
 
   /**
@@ -18,12 +21,12 @@ interface common_props {
    */
   uid: uid;
 
+  tags?: SOTag[];
+
   /**
-   * @description display in viewport and popup
+   * @description displayed in viewport and popup
    */
   title?: string;
-
-  tldr?: string;
 
   /**
    * @ignore
@@ -45,9 +48,9 @@ interface common_props {
    */
   github?: string;
 
-  similar?: relation[];
+  stackoverflow_tag?: string;
 
-  goes_with?: relation[];
+  relations?: relation[];
 }
 /**
  * @additionalProperties false
@@ -60,11 +63,6 @@ export interface Concept extends common_props {
  */
 export interface Product extends common_props {
   type: "product";
-
-  /**
-   * @ignore Github stars (in stats), sets object size
-   */
-  github_stars?: number;
 }
 
 /**

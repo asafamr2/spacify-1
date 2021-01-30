@@ -1,8 +1,8 @@
 import { argv, exit } from "process";
 import { Command } from "commander";
 import { logger, assertBasePathExists } from "./utils";
-import { SpaceObjectLoader } from "./object_loader";
-import * as fs from "fs";
+import { SpaceObjectLoader } from "./SpaceObjectLoader";
+import * as fs from "fs"; 
 
 main(argv)
   .then(() => {
@@ -46,9 +46,9 @@ async function main(argv: string[]) {
   logger.transports[0].level = parsedOptions.loglevel;
   await assertBasePathExists(parsedOptions.outputPath);
   const loader = new SpaceObjectLoader(parsedOptions.inputDir);
-  const objects = await loader.load();
+  const data = await loader.loadAndValidate();
 
   await fs.promises
-    .writeFile(parsedOptions.outputPath, JSON.stringify(objects))
+    .writeFile(parsedOptions.outputPath, JSON.stringify(data))
     .describeFailure("Could not write SpaceObjects to file");
 }

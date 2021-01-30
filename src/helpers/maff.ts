@@ -1,5 +1,17 @@
-export function clamp(val: number, min:number, max:number) {
+export function clamp(val: number, min: number, max: number) {
   return Math.min(max, Math.max(min, val));
+}
+
+const SOFT_CLAMP_START = 0.9;
+const SOFT_CLAMP_TANHMUL =
+  Math.atanh(SOFT_CLAMP_START - (1 - SOFT_CLAMP_START)) /
+  (SOFT_CLAMP_START - 0.5);
+export function softClamp(v: number, range: [number, number]) {
+  const diff = range[1] - range[0];
+  const t = (v - range[0]) / diff; // (0,1) in range
+  if (t < SOFT_CLAMP_START && t > 1 - SOFT_CLAMP_START) return v;
+  const centeredScaled = (t - 0.5) * SOFT_CLAMP_TANHMUL; // 0.9 and up diminishes (0.1 and down symmetrically)
+  return range[0]+diff * (0.5 + Math.tanh(centeredScaled) / 2);
 }
 
 export function smoothstep(edge0: number, edge1: number, x: number) {

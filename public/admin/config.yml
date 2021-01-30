@@ -1,0 +1,212 @@
+backend:
+  name: github
+  branch: staging
+  open_authoring: true
+  repo: asafamr/spacify
+publish_mode: editorial_workflow
+media_library:
+  name: disabled
+collections:
+  - name: Concept
+    label: Concept
+    format: json-frontmatter
+    extension: json
+    folder: _posts/blog
+    path: '{{category}}/{{uid}}'
+    create: true
+    fields:
+      - name: github
+        widget: string
+        pattern:
+          - ^https://github\.com/.*
+          - should match REGEX ^https://github\.com/.*
+        label: Github
+      - name: position
+        widget: object
+        fields:
+          - name: x
+            widget: number
+            value_type: float
+            label: X
+          - name: 'y'
+            widget: number
+            value_type: float
+            label: 'Y'
+        label: Position
+      - name: relations
+        widget: array
+        label: Relations
+      - name: stackoverflow_tag
+        widget: string
+        label: Stackoverflow Tag
+      - name: tags
+        widget: select
+        multiple: true
+        options:
+          - FREE
+          - LEADER
+          - OPEN_SOURCE
+          - TRENDING
+        label: Tags
+      - name: title
+        widget: string
+        hint: displayed in viewport and popup
+        label: Title
+      - name: type
+        widget: string
+        label: Type
+      - name: wiki
+        widget: string
+        pattern:
+          - ^https://en\.wikipedia\.org/.*
+          - should match REGEX ^https://en\.wikipedia\.org/.*
+        label: Wiki
+      - label: $schema
+        name: $schema
+        widget: hidden
+        default: ../something.json
+      - label: Category
+        name: category
+        widget: string
+  - name: Product
+    label: Product
+    format: json-frontmatter
+    extension: json
+    folder: _posts/blog
+    path: '{{category}}/{{uid}}'
+    create: true
+    fields:
+      - name: github
+        widget: string
+        pattern:
+          - ^https://github\.com/.*
+          - should match REGEX ^https://github\.com/.*
+        label: Github
+      - name: position
+        widget: object
+        fields:
+          - name: x
+            widget: number
+            value_type: float
+            label: X
+          - name: 'y'
+            widget: number
+            value_type: float
+            label: 'Y'
+        label: Position
+      - name: relations
+        widget: array
+        label: Relations
+      - name: stackoverflow_tag
+        widget: string
+        label: Stackoverflow Tag
+      - name: tags
+        widget: select
+        multiple: true
+        options:
+          - FREE
+          - LEADER
+          - OPEN_SOURCE
+          - TRENDING
+        label: Tags
+      - name: title
+        widget: string
+        hint: displayed in viewport and popup
+        label: Title
+      - name: type
+        widget: string
+        label: Type
+      - name: wiki
+        widget: string
+        pattern:
+          - ^https://en\.wikipedia\.org/.*
+          - should match REGEX ^https://en\.wikipedia\.org/.*
+        label: Wiki
+      - label: $schema
+        name: $schema
+        widget: hidden
+        default: ../something.json
+      - label: Category
+        name: category
+        widget: string
+  - name: SceneText
+    label: Scenetext
+    format: json-frontmatter
+    extension: json
+    folder: _posts/blog
+    path: '{{category}}/{{uid}}'
+    create: true
+    fields:
+      - name: arc
+        widget: number
+        value_type: float
+        hint: 1 for max. curvature, 0 means text follow a straight line
+        max: 1
+        label: Arc
+      - name: github
+        widget: string
+        pattern:
+          - ^https://github\.com/.*
+          - should match REGEX ^https://github\.com/.*
+        label: Github
+      - name: position
+        widget: object
+        fields:
+          - name: x
+            widget: number
+            value_type: float
+            label: X
+          - name: 'y'
+            widget: number
+            value_type: float
+            label: 'Y'
+        label: Position
+      - name: relations
+        widget: array
+        label: Relations
+      - name: rotation
+        widget: number
+        value_type: float
+        hint: clockwise rotation in degrees (-180,180)
+        max: 180
+        min: -180
+        label: Rotation
+      - name: size
+        widget: number
+        value_type: float
+        label: Size
+      - name: stackoverflow_tag
+        widget: string
+        label: Stackoverflow Tag
+      - name: tags
+        widget: select
+        multiple: true
+        options:
+          - FREE
+          - LEADER
+          - OPEN_SOURCE
+          - TRENDING
+        label: Tags
+      - name: text
+        widget: string
+        label: Text
+      - name: title
+        widget: string
+        hint: displayed in viewport and popup
+        label: Title
+      - name: type
+        widget: string
+        label: Type
+      - name: wiki
+        widget: string
+        pattern:
+          - ^https://en\.wikipedia\.org/.*
+          - should match REGEX ^https://en\.wikipedia\.org/.*
+        label: Wiki
+      - label: $schema
+        name: $schema
+        widget: hidden
+        default: ../something.json
+      - label: Category
+        name: category
+        widget: string

@@ -37,7 +37,7 @@ function serve() {
 
 export default {
   input: "src/main.ts",
-  external: ["three",'hammerjs'],
+  external: ["three",'Hammer'],
 
   output: {
     sourcemap: !production,

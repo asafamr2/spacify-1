@@ -1,0 +1,25 @@
+backend:
+  name: github
+  branch: staging
+  open_authoring: true
+  repo: asafamr/spacify
+publish_mode: editorial_workflow
+media_library:
+  name: disabled
+collections:
+  - name: "template" # replaced by script
+    label: "Blog" # Used in the UI
+    format: "json-frontmatter"
+    extension: "json"
+    folder: "_posts/blog" # The path to the folder where the documents are stored
+    path: "{{category}}/{{uid}}"
+    create: true # Allow users to create new documents in this collection
+    fields: # The fields for each document, usually in front matter
+      - {label: "Layout", name: "layout", widget: "hidden", default: "blog"}
+      - {label: "$schema", name: "$schema", widget: "hidden",default: "../something.json"}
+      - {label: "Title", name: "title", widget: "string"}
+      - {label: "Short ID", name: "uid", widget: "string", pattern: [".{5}","five letters"]}
+      - {label: "Category", name: "category", widget: "string",}
+      - {label: "Publish Date", name: "date", widget: "datetime"}
+      - {label: "Rating (scale of 1-5)", name: "rating", widget: "number"}
+      - {label: "Body", name: "body", widget: "markdown"}

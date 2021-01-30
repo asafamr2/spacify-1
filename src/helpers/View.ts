@@ -1,12 +1,10 @@
+export interface View {
+  readonly x: number;
+  readonly y: number;
+  readonly width: number;
+  readonly height: number;
+}
 
-export class View {
-  constructor(
-    public x: number,
-    public y: number,
-    public width: number,
-    public height: number,
-  ) { }
-  public toSvgString() {
-    return `${this.x} ${this.y} ${this.width} ${this.height}`;
-  }
+export function ViewToSvgBox(view: View) {
+  return `${view.x} ${view.y} ${view.width} ${view.height}`;
 }

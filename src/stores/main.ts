@@ -1,3 +1,6 @@
-import { writable } from 'svelte/store';
+import { writable } from "svelte/store";
+import type { View } from "../helpers/View";
 
-export const isInspect = writable(false);
+export const isInspectStore = writable<boolean>(false);
+
+

@@ -1,7 +1,6 @@
 {
   "$schema": "../../schema/schema.json",
   "type": "product",
-  "tldr": "Powerful open source",
   "wiki": "https://en.wikipedia.org/wiki/PostgreSQL",
   "github": "https://github.com/postgres/postgres",
   "position": {
@@ -9,3 +8,5 @@
     "y": 2
   }
 }
+
+# some markdown

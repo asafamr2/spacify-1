@@ -15,6 +15,18 @@
             "console": "integratedTerminal",
             "internalConsoleOptions": "openOnFirstSessionStart",
             "skipFiles": ["<node_internals>/**", "node_modules/**"]
+          },
+          {
+            "name": "jsonschema2nelifycms",
+            "type": "node",
+            "request": "launch",
+            "runtimeExecutable": "node",
+            "runtimeArgs": ["--nolazy", "-r", "ts-node/register/transpile-only"],
+            "args": ["src/js2netcms.ts"],
+            "cwd": "${workspaceRoot}/space-data",
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "openOnFirstSessionStart",
+            "skipFiles": ["<node_internals>/**", "node_modules/**"]
           }
       ]
 }

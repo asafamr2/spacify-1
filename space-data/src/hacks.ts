@@ -6,19 +6,18 @@ declare global {
     describeFailure(
       failMessage: string,
       addOriginalError?: boolean
-    ): Promise<T>;
+    ): PromiseLike<T>;
   }
 }
 
 function monkeyPatchPromises() {
-  //todo add runtime checks?
+  //todo add runtime checks for extra safety?
   console.log(
     chalk.yellow(
       "Monkey Patching Promise - should happen only during compilation!"
     )
   );
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
-  (Promise.prototype as any).describeFailure = describeFailure;
+  Promise.prototype.describeFailure = describeFailure;
 }
 
 function getErrorObject() {
@@ -34,7 +33,6 @@ function describeFailure(
   failMessage: string,
   addOriginalError = true
 ) {
-  // eslint-disable-next-line
   let lexicalStack = "";
   try {
     lexicalStack = getErrorObject().stack.split("\n").slice(3, 5).join("\n");
@@ -43,7 +41,9 @@ function describeFailure(
   return this.catch((err: unknown) => {
     let originalErr;
     if (addOriginalError) {
-      if (err instanceof Error) {
+      if (!err) {
+        originalErr = "";
+      } else if (err instanceof Error) {
         originalErr = err?.stack ? err.stack : err.message;
       } else {
         originalErr = String(err);

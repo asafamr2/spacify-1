@@ -6,14 +6,12 @@ export const logger = getLogger();
 
 export async function* walkDir(
     dir: string,
-    ext = ["json", "md"]
   ): AsyncGenerator<string, void, void> {
     for await (const d of await fs.promises.opendir(dir)) {
       const entry = path.join(dir, d.name);
       if (d.isDirectory()) yield* walkDir(entry);
       if (d.isFile()) {
-        if (ext.includes(d.name.split(".").pop())) yield entry;
-        else logger.warn(`${entry} is neither markdown nor json, skipping...`);
+         yield entry;
       } 
     }
   }

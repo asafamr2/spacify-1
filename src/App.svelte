@@ -1,20 +1,35 @@
 <script lang="ts">
   import type { SpaceObject } from "../space-data/schema/schema";
-  import StarsBg from "./components/webgl/StarsBG.svelte";
-  import { viewportable } from "./actions/viewportable";
   import type { View } from "./helpers/View";
+  import { ViewToSvgBox } from "./helpers/View";
   import Infotab from "./components/Infotab.svelte";
-  import { onMount } from "svelte/internal";
-  import { isInspect } from "./stores/main";
-  import { SpaceObjectToSvgComponent } from "./components/spaceobjects/mapping";
+  import StarsBg from "./components/webgl/StarsBG.svelte";
 
-  let currentView: View | null = null;
+  import { onMount } from "svelte/internal";
+  import { isInspectStore } from "./stores/main";
+  import { SpaceObjectToSvgComponent } from "./components/spaceobjects/mapping";
+  import { SpatialIndexService } from "./services/SpatialIndexService";
+  import type { SpaceData } from "../space-data/schema/data";
+  import { ViewportService} from "./services/ViewportService";
+
+
+  let mainElement:HTMLElement;
+  let currentView:View | undefined ;
+
+  onMount(async () => {
+    const viewportService = ViewportService.Init(mainElement);
+    viewportService.viewportStore.subscribe(v=>currentView =v);
+  })
+
   let selectedObject: SpaceObject | null = null;
   let spaceObjects: { [uid: string]: SpaceObject } = {};
 
   fetch(`build/space_objects.json`)
     .then((r) => r.json())
-    .then((json) => (spaceObjects = json));
+    .then((json: SpaceData) => {
+      SpatialIndexService.getService().setPoints(json.spatial);
+      spaceObjects = json.objects;
+    });
 
   function getObjectsInView(
     spaceObjs: { [uid: string]: SpaceObject },
@@ -31,30 +46,28 @@
     if (event.code == "KeyI" && event.shiftKey) {
       event.preventDefault();
       event.stopPropagation();
-      isInspect.update((v) => !v);
+      isInspectStore.update((v) => !v);
     }
   }
-  function viewchange(viewChange: CustomEvent<View>) {
-    currentView = viewChange.detail;
-  }
+
   function setSelected(sel: any) {
     selectedObject = sel;
   }
 
-  onMount(() => {});
 </script>
 
 <svelte:window
   on:contextmenu|capture|stopPropagation|preventDefault={() => false}
   on:keydown={keyPressed}
 />
-<main use:viewportable on:viewchange={viewchange}>
+<main bind:this={mainElement}>
   {#if currentView && Object.keys(spaceObjects).length}
-    <StarsBg view={currentView} />
+    <StarsBg />
     <svg
       class="svgboard"
-      viewBox={currentView.toSvgString()}
-      on:click|self={() => (selectedObject = null)}>
+      viewBox={ViewToSvgBox(currentView)}
+      on:click|self={() => (selectedObject = null)}
+    >
       {#each getObjectsInView(spaceObjects, currentView) as so (so[2])}
         <g on:click={() => setSelected(so[0])}>
           <svelte:component this={so[1]} so={so[0]} view={currentView} />
@@ -62,7 +75,7 @@
       {/each}
     </svg>
     <Infotab selected={selectedObject} />
-    {#if $isInspect}
+    {#if $isInspectStore}
       <div class="cur cursor-hor" />
       <div class="cur cursor-ver" />
       <div class="inspector">

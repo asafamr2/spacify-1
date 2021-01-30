@@ -1,12 +1,8 @@
 {
   "$schema": "../../schema/schema.json",
   "type": "product",
-  "tldr": "A nice open source RDBMS",
   "wiki": "https://en.wikipedia.org/wiki/MySQL",
   "github": "https://github.com/mysql/mysql-server",
-  "similar": [{
-    "ref": "sql/postgres"
-  }],
   "position": {
     "x": 2.5,
     "y": 2.5

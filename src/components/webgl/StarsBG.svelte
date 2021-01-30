@@ -3,16 +3,20 @@
   import * as THREE from "three";
   import { throttle } from "../../helpers/functional";
   import type { View } from "../../helpers/View";
+  import { ViewportService } from "../../services/ViewportService";
   import { fs, vs } from "./glslimport";
-
-  export let view: View;
+  let view: View;
 
   let renderCallback: () => void;
   let updateResolution: () => void;
-  $: {
-    if (view && renderCallback) renderCallback();
-    //renderCallback();
-  }
+
+  ViewportService.getService().then(
+    vs=>vs.viewportStore.subscribe(
+      (v) => {
+    view = v;
+    if (renderCallback) renderCallback();
+      })
+  )
 
   let container: Element;
 
