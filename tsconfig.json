@@ -7,6 +7,6 @@
   },
 
   "extends": "@tsconfig/svelte/tsconfig.json",
-  "include": [ "src/**/*", "typings/svelte.d.ts","space-data/schema/*"],
+  "include": [ "src/**/*", "typings/svelte.d.ts","space-data/schema/"],
   "exclude": ["node_modules/*", "__sapper__/*", "public/*", "space-data/src"]
 }

@@ -1,5 +1,6 @@
 /* eslint-disable  */
-import { JSONSchema } from "vscode-json-languageservice";
+import type { JSONSchema } from "vscode-json-languageservice";
+
 
 import * as fs from "fs";
 import * as path from "path";
@@ -7,6 +8,11 @@ import * as yaml from "js-yaml";
 
 import "./hacks";
 
+const JSONSCHEMA_PROP_TO_YAML = {
+  maximum: "max",
+  minimum: "min",
+  description: "hint",
+};
 export async function JsSc2NetCMS(anyofFilterField = "type") {
   const baseYamlStr = await fs.promises
     .readFile(path.join(__dirname, "..", "config.base.yml"))
@@ -22,10 +28,6 @@ export async function JsSc2NetCMS(anyofFilterField = "type") {
     .then((buff) => JSON.parse(buff.toString("utf8")) as JSONSchema)
     .describeFailure("Could not load jsonschema");
 
-  const type_mapping = {
-    string: "string",
-    object: "object",
-  };
   function subschemaToConfigFormatFields(subSchema: JSONSchema) {
     let fields = [];
     for (let [name, definition] of Object.entries(subSchema.properties)) {
@@ -37,9 +39,10 @@ export async function JsSc2NetCMS(anyofFilterField = "type") {
       } as Record<string, any>;
       if (definition.type === "object") {
         newProp.fields = subschemaToConfigFormatFields(definition);
-      } else if (
+      } 
+      else if (
         definition.type === "array" &&
-        (definition.items as JSONSchema).type === "string"
+        (definition.items as JSONSchema)?.type === "string"
       ) {
         // console.log((definition.items as any).enum);
         newProp["widget"] = "select";
@@ -48,20 +51,17 @@ export async function JsSc2NetCMS(anyofFilterField = "type") {
       } else if (definition.type === "number") {
         newProp["value_type"] = "float";
       }
-      if (definition.description) {
-        newProp.hint = definition.description;
-      }
+
       if (definition.pattern) {
         newProp.pattern = [
           definition.pattern,
           "should match REGEX " + definition.pattern,
         ];
       }
-      if (definition.maximum) {
-        newProp.max = definition.maximum;
-      }
-      if (definition.minimum) {
-        newProp.min = definition.minimum;
+      for (const [jprop, yprop] of Object.entries(JSONSCHEMA_PROP_TO_YAML)) {
+        if (jprop in definition) {
+          newProp[yprop] = jprop;
+        }
       }
       newProp["label"] = titleCase(newProp["name"]);
       fields.push(newProp);
@@ -83,11 +83,18 @@ export async function JsSc2NetCMS(anyofFilterField = "type") {
       default: "../something.json",
     });
     newCollection["fields"].push({
-        label: "Category",
-        name: "category",
-        widget: "string"
-      });
+      label: "Category",
+      name: "category",
+      widget: "string",
+    });
     configYaml["collections"].push(newCollection);
+    newCollection["fields"]= newCollection["fields"].filter((x:any)=>x?.name !== 'type')
+    newCollection["fields"].push({
+      label: "Type",
+      name: "type",
+      widget: "hidden",
+      default: (subSchema as any).properties.type.enum[0],
+    });
   }
   return yaml.dump(configYaml);
 }
@@ -98,7 +105,7 @@ JsSc2NetCMS()
       x
     )
   )
-  .catch((err) => console.log("err", err));
+ 
 
 function titleCase(str: string) {
   return str

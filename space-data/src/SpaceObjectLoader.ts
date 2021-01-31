@@ -105,7 +105,9 @@ export class SpaceObjectLoader {
     throw new Error("Could not match curly brackets in json");
   }
 
-  protected async getValidatedSpaceObjectFromJson(content: string):Promise<SpaceObject> {
+  protected async getValidatedSpaceObjectFromJson(
+    content: string
+  ): Promise<SpaceObject> {
     let so: SpaceObject;
     let textDoc: TextDocument;
     let jsonDoc: JSONDocument;
@@ -113,7 +115,7 @@ export class SpaceObjectLoader {
     await Promise.resolve()
       .then(() => {
         so = JSON.parse(content) as SpaceObject;
-        textDoc = TextDocument.create               (
+        textDoc = TextDocument.create(
           "foo://bar/file.json",
           "json",
           0,
@@ -181,10 +183,21 @@ export class SpaceObjectLoader {
 
   protected async validateRelations(objs: { [uid: string]: SpaceObject }) {
     for (const [uid, so] of Object.entries(objs)) {
-      for (const ref of [...(so.relations ?? [])]) {
-        if (!(ref.ref in objs)) {
+      if (so.type === "birelated") {
+        if (!(so.child_uid in objs)) {
           return Promise.reject(
-            `${uid}(.json) references a missing object: ${ref.ref}`
+            `${uid}(.json) references a missing object: ${so.child_uid}`
+          );
+        }
+        if (!(so.parent_uid in objs)) {
+          return Promise.reject(
+            `${uid}(.json) references a missing object: ${so.parent_uid}`
+          );
+        }
+      } else if (so.type === "related") {
+        if (!(so.parent_uid in objs)) {
+          return Promise.reject(
+            `${uid}(.json) references a missing object: ${so.parent_uid}`
           );
         }
       }
@@ -197,13 +210,15 @@ export class SpaceObjectLoader {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call
     const rbush: RBush_type<BBox & { uid: string }> = new (RBush as any)();
     for (const [uid, spaceObject] of Object.entries(objs)) {
-      rbush.insert({
-        minX: spaceObject.position.x - boxSize / 2,
-        minY: spaceObject.position.y - boxSize / 2,
-        maxX: spaceObject.position.x + boxSize / 2,
-        maxY: spaceObject.position.y + boxSize / 2,
-        uid: uid,
-      });
+      if ("position" in spaceObject) {
+        rbush.insert({
+          minX: spaceObject.position.x - boxSize / 2,
+          minY: spaceObject.position.y - boxSize / 2,
+          maxX: spaceObject.position.x + boxSize / 2,
+          maxY: spaceObject.position.y + boxSize / 2,
+          uid: uid,
+        });
+      }
     }
     return rbush.toJSON() as SpatialIndex;
   }

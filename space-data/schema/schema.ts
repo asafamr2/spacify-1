@@ -4,10 +4,17 @@
  */
 export type uid = string;
 
-type SOTag = "LEADER" | "OPEN_SOURCE" | "FREE" | "TRENDING";
+type ProductTag = "CATEGORY_LEADER" | "OPEN_SOURCE" | "FREE" | "TRENDING";
+type PlanetTag = "ADVANCED_TOPIC" | "CONCERN" | "CONCEPT";
 
-interface relation {
-  ref: uid;
+interface has_position {
+  /**
+   * @description position in space
+   */
+  position: {
+    x: number;
+    y: number;
+  };
 }
 
 interface common_props {
@@ -21,57 +28,55 @@ interface common_props {
    */
   uid: uid;
 
-  tags?: SOTag[];
+  category:string;
 
   /**
    * @description displayed in viewport and popup
    */
-  title?: string;
+  title: string;
 
   /**
    * @ignore
    */
-  markdown: string;
-
-  position: {
-    x: number;
-    y: number;
-  };
+  markdown?: string;
 
   /**
+   * @description wikipedia page url
    * @pattern "^https://en\\.wikipedia\\.org/.*"
    */
   wiki?: string;
+}
+/**
+ * @additionalProperties false
+ */
+export interface Planet extends common_props, has_position {
+  readonly type: "planet";
+  tags?: PlanetTag[];
+}
+
+/**
+ * @additionalProperties false
+ */
+export interface Product extends common_props, has_position {
+  readonly type: "product";
 
   /**
+   * @description github repo url
    * @pattern "^https://github\\.com/.*"
    */
   github?: string;
 
   stackoverflow_tag?: string;
 
-  relations?: relation[];
-}
-/**
- * @additionalProperties false
- */
-export interface Concept extends common_props {
-  type: "concept";
-}
-/**
- * @additionalProperties false
- */
-export interface Product extends common_props {
-  type: "product";
+  tags?: ProductTag[];
 }
 
 /**
  * @additionalProperties false
  */
-export interface SceneText extends common_props {
-  type: "scenetext";
+export interface SceneText extends common_props, has_position {
+  readonly type: "scenetext";
   size: number;
-  text: string;
 
   /**
    * @description 1 for max. curvature, 0 means text follow a straight line
@@ -88,4 +93,15 @@ export interface SceneText extends common_props {
   rotation: number;
 }
 
-export type SpaceObject = SceneText | Concept | Product;
+interface Related extends common_props {
+  readonly type: "related";
+  parent_uid: uid;
+}
+
+interface BiRelated extends common_props {
+  readonly type: "birelated";
+  parent_uid: uid;
+  child_uid: uid;
+}
+
+export type SpaceObject = SceneText | Planet | Product | Related | BiRelated;

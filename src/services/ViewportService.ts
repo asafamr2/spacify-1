@@ -4,6 +4,7 @@ import { clamp } from "../helpers/maff";
 import type { View } from "../helpers/View";
 import { AsyncService } from "./Service";
 import Hammer from "hammerjs";
+import type { Point } from "../helpers/Point";
 
 interface ViewFreeDims {
   x: number;
@@ -28,17 +29,19 @@ abstract class Unexported<T> {
   Spring = spring<T>();
   Writable = writable<T>({} as T);
 }
+type ViewSpring = Unexported<ViewFreeDims>["Spring"];
+type ViewWriteable = Unexported<View>["Writable"];
 
 export class ViewportService extends AsyncService {
-  vn: ViewportNode;
-  viewportStore: Unexported<View>["Writable"];
+  protected _vn: ViewportNode;
+  protected _viewportStore: Unexported<View>["Writable"];
   protected constructor(
     vn: ViewportNode,
     viewportStore: Unexported<View>["Writable"]
   ) {
     super();
-    this.vn = vn;
-    this.viewportStore = viewportStore;
+    this._vn = vn;
+    this._viewportStore = viewportStore;
   }
 
   public static Init(node: HTMLElement) {
@@ -47,8 +50,12 @@ export class ViewportService extends AsyncService {
     return new ViewportService(vn, vs);
   }
 
-  public getViewportStore(this: this) {
-    return this.viewportStore;
+  public  getViewportStore(this:this) {
+    return this._viewportStore;
+  }
+
+  public updateShift(selectionPos: Point | null, isHorizontal: boolean) {
+    this._vn.updateShift(selectionPos, isHorizontal);
   }
 }
 
@@ -59,13 +66,16 @@ class ViewportNode {
   protected nodeBoundingRect: DOMRect;
   protected widthHeightRatio: number;
   protected unsubscribeCurrent: () => void = () => {};
-  protected viewSpring: Unexported<ViewFreeDims>["Spring"];
+  protected viewSpring: ViewSpring;
   protected cleanups: Cleanup[] = [];
+  protected viewShift: Point = { x: 0, y: 0 };
+  protected viewGoalWithoutShift: ViewFreeDims;
   public constructor(
     protected node: HTMLElement,
-    protected viewportStore: Unexported<View>["Writable"],
+    protected viewportStore: ViewWriteable,
     protected currentView: View
   ) {
+    this.viewGoalWithoutShift = currentView;
     this.nodeBoundingRect = node.getBoundingClientRect();
     this.widthHeightRatio =
       this.nodeBoundingRect.width / this.nodeBoundingRect.height;
@@ -90,6 +100,29 @@ class ViewportNode {
       cp();
     }
   }
+  public updateShift(selectionPos: Point | null, isHorizontal: boolean) {
+    const newShift: Point = { x: 0, y: 0 };
+    if (selectionPos) {
+      newShift.x =
+        selectionPos.x -
+        this.viewGoalWithoutShift.x -
+        (isHorizontal ? 0.25 : 0.5) * this.viewGoalWithoutShift.width;
+
+      newShift.y =
+        selectionPos.y -
+        this.viewGoalWithoutShift.y -
+        ((!isHorizontal ? 0.25 : 0.5) * this.viewGoalWithoutShift.width) /
+          this.widthHeightRatio;
+    }
+
+    if (
+      Math.abs(newShift.x - this.viewShift.x + newShift.y - this.viewShift.y) >
+      0.01
+    ) {
+      this.viewShift = newShift;
+      this.setViewSmooth(this.viewGoalWithoutShift);
+    }
+  }
   protected registerEvents(this: this) {
     const lwheel = (e: WheelEvent) => this.onWheel(e);
     const lresize = this.onResize.bind(this);
@@ -108,11 +141,19 @@ class ViewportNode {
       v.x < viewLimits.x[0] ||
       v.x + v.width > viewLimits.x[1] ||
       v.y < viewLimits.y[0] ||
-      v.y + v.width * 4 > viewLimits.y[1]
+      v.y + v.width / this.widthHeightRatio > viewLimits.y[1]
     ) {
       return;
     }
-    void this.viewSpring.set(v, { soft: 0.05 });
+    this.viewGoalWithoutShift = v;
+    void this.viewSpring.set(
+      {
+        x: v.x + this.viewShift.x,
+        y: v.y + this.viewShift.y,
+        width: v.width,
+      },
+      { soft: 0.05 }
+    );
   }
 
   protected getScaledView(
@@ -124,11 +165,11 @@ class ViewportNode {
     const rect = this.nodeBoundingRect;
     const relPosX = (clientX - rect.left) / rect.width;
     const relPosY = (clientY - rect.top) / rect.height;
-    const newWidth = clamp(this.currentView.width * scale, 10, 1000);
-    const diff = newWidth - this.currentView.width;
+    const newWidth = clamp(this.viewGoalWithoutShift.width * scale, 10, 1000);
+    const diff = newWidth - this.viewGoalWithoutShift.width;
     return {
-      x: this.currentView.x - relPosX * diff,
-      y: this.currentView.y - (relPosY * diff) / this.widthHeightRatio,
+      x: this.viewGoalWithoutShift.x - relPosX * diff,
+      y: this.viewGoalWithoutShift.y - (relPosY * diff) / this.widthHeightRatio,
       width: newWidth,
       height: newWidth / this.widthHeightRatio,
     };
@@ -157,6 +198,7 @@ class ViewportNode {
     });
     mc.on("panmove pinchmove", (ev) => {
       if (!beforeMoveView) return;
+      this.viewShift = { x: 0, y: 0 };
       let pxToUnit = beforeMoveView.width / this.nodeBoundingRect.width;
       if (ev.type === "pinchmove") {
         pxToUnit = 0;

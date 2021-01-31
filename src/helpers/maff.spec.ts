@@ -1,4 +1,4 @@
-import { clamp, smoothstep, strHash, softClamp } from "./maff";
+import { clamp, smoothstep, strHash, softClamp,bandpass } from "./maff";
 import "ts-jest";
 
 it("clamps", () => {
@@ -15,6 +15,16 @@ it("smoothstep", () => {
   expect(smoothstep(200, 100, 100)).toBeCloseTo(1);
   expect(smoothstep(200, 100, 200)).toBeCloseTo(0);
 });
+
+
+
+it("bandpass", () => {
+  expect(bandpass([0.1,0.2,0.5,0.6],0.2)).toBeCloseTo(1);
+  expect(bandpass([0.1,0.2,0.5,0.6],0.15)).toBeCloseTo(0.5);
+  expect(bandpass([0.1,0.2,0.5,0.6],0.55)).toBeCloseTo(0.5);
+  expect(bandpass([0.1,0.2,0.5,0.6],0.7)).toBeCloseTo(0);
+});
+
 
 it("strHash", () => {
   expect(

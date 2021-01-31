@@ -2,28 +2,78 @@
     "$schema": "http://json-schema.org/draft-07/schema#",
     "anyOf": [
         {
-            "$ref": "#/definitions/Concept"
+            "$ref": "#/definitions/Planet"
         },
         {
             "$ref": "#/definitions/Product"
         },
         {
             "$ref": "#/definitions/SceneText"
+        },
+        {
+            "$ref": "#/definitions/Related"
+        },
+        {
+            "$ref": "#/definitions/BiRelated"
         }
     ],
     "definitions": {
-        "Concept": {
+        "BiRelated": {
+            "properties": {
+                "$schema": {
+                    "description": "for json schema",
+                    "type": "string"
+                },
+                "category": {
+                    "type": "string"
+                },
+                "child_uid": {
+                    "description": "Unique and short identifier used to reference this object.",
+                    "pattern": "^[a-z0-9/]*$",
+                    "type": "string"
+                },
+                "parent_uid": {
+                    "description": "Unique and short identifier used to reference this object.",
+                    "pattern": "^[a-z0-9/]*$",
+                    "type": "string"
+                },
+                "title": {
+                    "description": "displayed in viewport and popup",
+                    "type": "string"
+                },
+                "type": {
+                    "enum": [
+                        "birelated"
+                    ],
+                    "type": "string"
+                },
+                "wiki": {
+                    "description": "wikipedia page url",
+                    "pattern": "^https://en\\.wikipedia\\.org/.*",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "category",
+                "child_uid",
+                "parent_uid",
+                "title",
+                "type"
+            ],
+            "type": "object"
+        },
+        "Planet": {
             "additionalProperties": false,
             "properties": {
                 "$schema": {
                     "description": "for json schema",
                     "type": "string"
                 },
-                "github": {
-                    "pattern": "^https://github\\.com/.*",
+                "category": {
                     "type": "string"
                 },
                 "position": {
+                    "description": "position in space",
                     "properties": {
                         "x": {
                             "type": "number"
@@ -38,22 +88,12 @@
                     ],
                     "type": "object"
                 },
-                "relations": {
-                    "items": {
-                        "$ref": "#/definitions/relation"
-                    },
-                    "type": "array"
-                },
-                "stackoverflow_tag": {
-                    "type": "string"
-                },
                 "tags": {
                     "items": {
                         "enum": [
-                            "FREE",
-                            "LEADER",
-                            "OPEN_SOURCE",
-                            "TRENDING"
+                            "ADVANCED_TOPIC",
+                            "CONCEPT",
+                            "CONCERN"
                         ],
                         "type": "string"
                     },
@@ -65,17 +105,20 @@
                 },
                 "type": {
                     "enum": [
-                        "concept"
+                        "planet"
                     ],
                     "type": "string"
                 },
                 "wiki": {
+                    "description": "wikipedia page url",
                     "pattern": "^https://en\\.wikipedia\\.org/.*",
                     "type": "string"
                 }
             },
             "required": [
+                "category",
                 "position",
+                "title",
                 "type"
             ],
             "type": "object"
@@ -87,11 +130,16 @@
                     "description": "for json schema",
                     "type": "string"
                 },
+                "category": {
+                    "type": "string"
+                },
                 "github": {
+                    "description": "github repo url",
                     "pattern": "^https://github\\.com/.*",
                     "type": "string"
                 },
                 "position": {
+                    "description": "position in space",
                     "properties": {
                         "x": {
                             "type": "number"
@@ -106,20 +154,14 @@
                     ],
                     "type": "object"
                 },
-                "relations": {
-                    "items": {
-                        "$ref": "#/definitions/relation"
-                    },
-                    "type": "array"
-                },
                 "stackoverflow_tag": {
                     "type": "string"
                 },
                 "tags": {
                     "items": {
                         "enum": [
+                            "CATEGORY_LEADER",
                             "FREE",
-                            "LEADER",
                             "OPEN_SOURCE",
                             "TRENDING"
                         ],
@@ -138,12 +180,53 @@
                     "type": "string"
                 },
                 "wiki": {
+                    "description": "wikipedia page url",
                     "pattern": "^https://en\\.wikipedia\\.org/.*",
                     "type": "string"
                 }
             },
             "required": [
+                "category",
                 "position",
+                "title",
+                "type"
+            ],
+            "type": "object"
+        },
+        "Related": {
+            "properties": {
+                "$schema": {
+                    "description": "for json schema",
+                    "type": "string"
+                },
+                "category": {
+                    "type": "string"
+                },
+                "parent_uid": {
+                    "description": "Unique and short identifier used to reference this object.",
+                    "pattern": "^[a-z0-9/]*$",
+                    "type": "string"
+                },
+                "title": {
+                    "description": "displayed in viewport and popup",
+                    "type": "string"
+                },
+                "type": {
+                    "enum": [
+                        "related"
+                    ],
+                    "type": "string"
+                },
+                "wiki": {
+                    "description": "wikipedia page url",
+                    "pattern": "^https://en\\.wikipedia\\.org/.*",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "category",
+                "parent_uid",
+                "title",
                 "type"
             ],
             "type": "object"
@@ -161,11 +244,11 @@
                     "minimum": 0,
                     "type": "number"
                 },
-                "github": {
-                    "pattern": "^https://github\\.com/.*",
+                "category": {
                     "type": "string"
                 },
                 "position": {
+                    "description": "position in space",
                     "properties": {
                         "x": {
                             "type": "number"
@@ -180,12 +263,6 @@
                     ],
                     "type": "object"
                 },
-                "relations": {
-                    "items": {
-                        "$ref": "#/definitions/relation"
-                    },
-                    "type": "array"
-                },
                 "rotation": {
                     "description": "clockwise rotation in degrees (-180,180)",
                     "maximum": 180,
@@ -194,24 +271,6 @@
                 },
                 "size": {
                     "type": "number"
-                },
-                "stackoverflow_tag": {
-                    "type": "string"
-                },
-                "tags": {
-                    "items": {
-                        "enum": [
-                            "FREE",
-                            "LEADER",
-                            "OPEN_SOURCE",
-                            "TRENDING"
-                        ],
-                        "type": "string"
-                    },
-                    "type": "array"
-                },
-                "text": {
-                    "type": "string"
                 },
                 "title": {
                     "description": "displayed in viewport and popup",
@@ -224,30 +283,19 @@
                     "type": "string"
                 },
                 "wiki": {
+                    "description": "wikipedia page url",
                     "pattern": "^https://en\\.wikipedia\\.org/.*",
                     "type": "string"
                 }
             },
             "required": [
                 "arc",
+                "category",
                 "position",
                 "rotation",
                 "size",
-                "text",
+                "title",
                 "type"
-            ],
-            "type": "object"
-        },
-        "relation": {
-            "properties": {
-                "ref": {
-                    "description": "Unique and short identifier used to reference this object.",
-                    "pattern": "^[a-z0-9/]*$",
-                    "type": "string"
-                }
-            },
-            "required": [
-                "ref"
             ],
             "type": "object"
         }

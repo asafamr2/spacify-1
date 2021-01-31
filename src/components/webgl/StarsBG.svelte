@@ -11,7 +11,7 @@
   let updateResolution: () => void;
 
   ViewportService.getService().then(
-    vs=>vs.viewportStore.subscribe(
+    vs=>vs.getViewportStore().subscribe(
       (v) => {
     view = v;
     if (renderCallback) renderCallback();
@@ -107,6 +107,6 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgb(112, 92, 101);
+    background-color: hsl(242, 39%, 14%);
   }
 </style>

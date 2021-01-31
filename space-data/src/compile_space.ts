@@ -51,4 +51,6 @@ async function main(argv: string[]) {
   await fs.promises
     .writeFile(parsedOptions.outputPath, JSON.stringify(data))
     .describeFailure("Could not write SpaceObjects to file");
+  
+  
 }

@@ -1,6 +1,8 @@
 {
   "$schema": "../../schema/schema.json",
+  "category": "sql",
   "type": "product",
+  "title": "MySQL",
   "wiki": "https://en.wikipedia.org/wiki/MySQL",
   "github": "https://github.com/mysql/mysql-server",
   "position": {

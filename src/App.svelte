@@ -2,7 +2,7 @@
   import type { SpaceObject } from "../space-data/schema/schema";
   import type { View } from "./helpers/View";
   import { ViewToSvgBox } from "./helpers/View";
-  import Infotab from "./components/Infotab.svelte";
+  import InfoPop from "./components/InfoPop.svelte";
   import StarsBg from "./components/webgl/StarsBG.svelte";
 
   import { onMount } from "svelte/internal";
@@ -18,7 +18,7 @@
 
   onMount(async () => {
     const viewportService = ViewportService.Init(mainElement);
-    viewportService.viewportStore.subscribe(v=>currentView =v);
+    viewportService.getViewportStore().subscribe(v=>currentView =v);
   })
 
   let selectedObject: SpaceObject | null = null;
@@ -69,12 +69,10 @@
       on:click|self={() => (selectedObject = null)}
     >
       {#each getObjectsInView(spaceObjects, currentView) as so (so[2])}
-        <g on:click={() => setSelected(so[0])}>
-          <svelte:component this={so[1]} so={so[0]} view={currentView} />
-        </g>
+          <svelte:component this={so[1]} so={so[0]} view={currentView} on:select={() => setSelected(so[0])}/>
       {/each}
     </svg>
-    <Infotab selected={selectedObject} />
+    <InfoPop so={selectedObject} on:close={() => (selectedObject = null)}/>
     {#if $isInspectStore}
       <div class="cur cursor-hor" />
       <div class="cur cursor-ver" />

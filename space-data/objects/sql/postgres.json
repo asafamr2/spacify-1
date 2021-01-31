@@ -1,6 +1,8 @@
 {
   "$schema": "../../schema/schema.json",
+  "category": "sql",
   "type": "product",
+  "title": "PostgreSQL",
   "wiki": "https://en.wikipedia.org/wiki/PostgreSQL",
   "github": "https://github.com/postgres/postgres",
   "position": {
