@@ -1,0 +1,11 @@
+{
+"$schema": "../../schema/schema.json",
+  "type": "planet",
+  "title": "aaa",
+  "uid": "bbbb",
+  "category": "sss",
+  "position": {
+    "x": 1,
+    "y": 1
+  }
+}
