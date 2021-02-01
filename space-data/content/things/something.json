@@ -1,14 +1,12 @@
 {
-"$schema": "../../schema/schema.json",
-  "type": "planet",
-  "title": "Some Thing",
+"title": "some thing",
   "uid": "something",
   "category": "things",
   "tags": [
     "CONCEPT"
   ],
   "position": {
-    "x": 44,
-    "y": 22
+    "x": 22,
+    "y": 44
   }
 }
