@@ -1,19 +1,25 @@
 <!doctype html>
 <html>
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Content Manager</title>
 </head>
+
 <body>
-  <!-- Include the script that builds the page and powers Netlify CMS -->
-  <script src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"></script>
+  <script src="https://unpkg.com/react@^16/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@^16/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/netlify-cms-app/dist/netlify-cms-app.js"></script>
   <script src="https://unpkg.com/netlify-auth-providers"></script>
   <script>
-    CMS.registerMediaLibrary({
-      name: 'disabled',
-      init: () => ({ show: () => undefined, enableStandalone: () => false }),
-    });
+      NetlifyCmsApp.registerMediaLibrary({
+        name: 'disabled',
+        init: () => ({ show: () => undefined, enableStandalone: () => false }),
+      });
+      NetlifyCmsApp.init();
+
   </script>
 </body>
+
 </html>

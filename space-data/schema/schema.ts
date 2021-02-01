@@ -5,7 +5,7 @@
 export type uid = string;
 
 type ProductTag = "CATEGORY_LEADER" | "OPEN_SOURCE" | "FREE" | "TRENDING";
-type PlanetTag = "ADVANCED_TOPIC" | "CONCERN" | "CONCEPT";
+type ConceptTag = "ADVANCED_TOPIC" | "CONCERN" ;
 
 interface has_position {
   /**
@@ -50,9 +50,9 @@ interface common_props {
 /**
  * @additionalProperties false
  */
-export interface Planet extends common_props, has_position {
-  readonly type: "planet";
-  tags?: PlanetTag[];
+export interface Concept extends common_props, has_position {
+  readonly type: "concept";
+  tags?: ConceptTag[];
 }
 
 /**
@@ -105,4 +105,4 @@ interface BiRelated extends common_props {
   child_uid: uid;
 }
 
-export type SpaceObject = SceneText | Planet | Product | Related | BiRelated;
+export type SpaceObject = SceneText | Concept | Product | Related | BiRelated;

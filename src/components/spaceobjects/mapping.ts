@@ -1,6 +1,6 @@
 import CPlanet from "./svg/PlanetSvg.svelte";
 import CSpaceText from "./svg/SpacetextSvg.svelte";
-import PlanetInfo from "./info/Planet.svelte";
+import ConceptInfo from "./info/Concept.svelte";
 import ProductInfo from "./info/Product.svelte";
 
 import type { SpaceObject } from "../../../space-data/schema/schema";
@@ -15,8 +15,8 @@ export function SpaceObjectToSvgComponent(so: SpaceObject) {
 
 
 export function SpaceObjectToInfoTemplate(so: SpaceObject) {
-  if (so.type === "planet") {
-    return PlanetInfo;
+  if (so.type === "concept") {
+    return ConceptInfo;
   } else if(so.type === "product"){
     return ProductInfo;
   } else {

@@ -8,8 +8,6 @@ import RBush_type from "rbush"; // hmm
 import type { BBox } from "rbush";
 import { SpaceData, SpatialIndex } from "../schema/data";
 
-import "./hacks";
-
 import {
   getLanguageService,
   TextDocument,
@@ -17,7 +15,7 @@ import {
   LanguageService,
   JSONSchema,
 } from "vscode-json-languageservice";
-import { logger, walkDir } from "./utils";
+import { explain, logger, walkDir } from "./utils";
 import { SpaceObject } from "../schema/schema";
 
 export class SpaceObjectLoader {
@@ -30,7 +28,7 @@ export class SpaceObjectLoader {
       .readFile(path.resolve(__dirname, "../schema/schema.json"))
       .then((buffer) => buffer.toString("utf8"))
       .then((str) => JSON.parse(str) as JSONSchema)
-      .describeFailure("Could not load json schema");
+      .catch(explain("Could not load json schema"));
 
     logger.debug(`Loading vscode json language service...`);
     this.jsonLanguageService = getLanguageService({});
@@ -40,7 +38,7 @@ export class SpaceObjectLoader {
 
     for await (const filePath of walkDir(this.dirname)) {
       logger.debug(`Loading ${filePath}...`);
-      await this.processFile(filePath)
+      await this.loadFile(filePath)
         .then((res) => {
           spaceObjects[this.pathToUid(filePath)] = res;
         })
@@ -52,28 +50,32 @@ export class SpaceObjectLoader {
     const spIdx = this.getSpatialIndex(spaceObjects);
 
     if (errors.length > 0) {
-      return Promise.reject(errors.map((e) => "* " + e).join("\n\n"));
+      return Promise.reject(errors);
     }
     return { objects: spaceObjects, spatial: spIdx };
   }
 
-  protected async processFile(filePath: string) {
+  protected async loadFile(filePath: string) {
     if (!filePath.endsWith("json")) {
-      return Promise.reject().describeFailure(
+      return Promise.reject().catch(explain(
         "Unknown file extension for: " + filePath
-      );
+      ));
     }
     const content = await this.getFileContent(filePath) //
-      .describeFailure("Could not load file content: " + filePath);
+      .catch(explain("Could not load file content: " + filePath));
     const [jsonpart, mdpart] = await Promise.resolve()
       .then(() => SpaceObjectLoader.splitJsonMd(content))
-      .describeFailure("Could not splits file content: " + filePath);
-    const html = await this.parseMarkdown(mdpart).describeFailure(
+      .catch(explain("Could not splits file content: " + filePath));
+    const html = await this.parseMarkdown(mdpart).catch(explain(
       "Could not validate markdown: " + filePath
-    );
+    ));
     const so = await this.getValidatedSpaceObjectFromJson(
       jsonpart
-    ).describeFailure("Could not validate jsonschema: " + filePath);
+    ).catch(explain("Could not validate jsonschema: " + filePath));
+
+    if(!filePath.replace('\\','/').endsWith(`${so.category}/${so.uid}.json`)){
+      throw new Error('Filename should match template {category}/{uid}.json')
+    }
     so.markdown = html;
     return so;
   }
@@ -123,7 +125,7 @@ export class SpaceObjectLoader {
         );
         jsonDoc = this.jsonLanguageService.parseJSONDocument(textDoc);
       })
-      .describeFailure("Could not parse JSON");
+      .catch(explain("Could not parse JSON"));
 
     const errors = await this.jsonLanguageService
       .doValidation(textDoc, jsonDoc, undefined, this.jsonschema)
@@ -158,7 +160,7 @@ export class SpaceObjectLoader {
         return msg;
       })
       .join("\n");
-    return Promise.reject().describeFailure(errorMessage);
+    return Promise.reject().catch(explain(errorMessage));
   }
 
   protected async parseMarkdown(content: string): Promise<string> {

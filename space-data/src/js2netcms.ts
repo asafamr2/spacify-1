@@ -9,7 +9,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as yaml from "js-yaml";
 
-import "./hacks";
+import { explain } from "./utils";
 
 const JSONSCHEMA_PROP_TO_YAML = {
   maximum: "max",
@@ -20,6 +20,7 @@ const JSONSCHEMA_PROP_TO_YAML = {
 const FIELDS_IMPORTANCE = [
   "title",
   "uid",
+  "position",
   "category",
   "tags",
   "arc",
@@ -31,7 +32,7 @@ export async function JsSc2NetCMS() {
   const baseYamlStr = await fs.promises
     .readFile(path.join(__dirname, "..", "config.base.yml"))
     .then((buff) => buff.toString("utf8"))
-    .describeFailure("Could not load base config yaml");
+    .catch(explain("Could not load base config yaml"));
   const configYaml: any = yaml.load(baseYamlStr) as any;
   const baseCollection = configYaml["collections"][0];
 
@@ -40,7 +41,7 @@ export async function JsSc2NetCMS() {
   const jsonschema: JSONSchema = await fs.promises
     .readFile(path.join(__dirname, "..", "schema", "schema.json"))
     .then((buff) => JSON.parse(buff.toString("utf8")) as JSONSchema)
-    .describeFailure("Could not load jsonschema");
+    .catch(explain("Could not load jsonschema"));
 
   function subschemaToConfigFormatFields(subSchema: JSONSchema) {
     const fields = [];
@@ -65,12 +66,6 @@ export async function JsSc2NetCMS() {
         newProp["value_type"] = "float";
       }
       newProp["required"] = !!subSchema?.required?.includes(name);
-
-      if (newProp.fields) {
-        newProp["fields"].sort(
-          (x: { name: string }) => FIELDS_IMPORTANCE.indexOf(x.name) + 1 ?? 9999
-        );
-      }
 
       if (definition.pattern) {
         newProp.pattern = [
@@ -112,13 +107,28 @@ export async function JsSc2NetCMS() {
 
     newCollection["filter"] = { field: "type", value: newCollection.name };
 
-    configYaml["collections"].push(newCollection);
     newCollection["fields"].push({
       label: "Type",
       name: "type",
       widget: "hidden",
       default: (subSchema as any).properties.type.enum[0],
     });
+
+    (newCollection["fields"] as Array<{ name: string }>).sort(
+      (a, b) =>
+        (FIELDS_IMPORTANCE.indexOf(a.name) + 1 || 999) -
+        (FIELDS_IMPORTANCE.indexOf(b.name) + 1 || 999)
+    );
+
+    newCollection["fields"].push({
+      label: "Body",
+      name: "body",
+      widget: "markdown",
+      default: ' ',
+      required: true
+    });
+
+    configYaml["collections"].push(newCollection);
   }
   return yaml.dump(configYaml, {
     sortKeys: (a: string, b: string) => {

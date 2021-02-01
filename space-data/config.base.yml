@@ -7,13 +7,18 @@ publish_mode: editorial_workflow
 media_library:
   name: disabled
 collections: # just for reference - replaced by script
-  - name: "planet" 
-    label: "Planet" 
+  - name: "planet"
+    label: "Planet"
     format: "json-frontmatter"
     extension: "json"
-    folder: "space-data/content" 
+    folder: "space-data/content"
     path: "{{category}}/{{uid}}"
-    create: true 
-    fields: 
-      - {label: "$schema", name: "$schema", widget: "hidden",default: "../something.json"}
-      - {label: "Body", name: "body", widget: "markdown"}
+    create: true
+    fields:
+      - {
+          label: "$schema",
+          name: "$schema",
+          widget: "hidden",
+          default: "../something.json",
+        }
+      - { label: "Body", name: "body", widget: "markdown" }

@@ -1,21 +1,21 @@
 import { argv, exit } from "process";
 import { Command } from "commander";
-import { logger, assertBasePathExists } from "./utils";
+import { logger, assertBasePathExists,explain } from "./utils";
 import { SpaceObjectLoader } from "./SpaceObjectLoader";
-import * as fs from "fs"; 
+import * as fs from "fs";
 
 main(argv)
   .then(() => {
     logger.info("Done.");
   })
   .catch((err) => {
-    const errorStr =
-      err instanceof Error
-        ? err.stack
-          ? err.stack
-          : err.message
-        : String(err);
-    logger.error(errorStr);
+    if (Array.isArray(err)) {
+      err.forEach((element) => {
+        logger.error("Error in data compilation\n", element);
+      });
+    } else {
+      logger.error("Error in data compilation\n", err);
+    }
     exit(1);
   });
 
@@ -41,16 +41,13 @@ async function main(argv: string[]) {
     loglevel: string;
     outputPath: string;
     inputDir: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } = command.opts() as any;
-  logger.transports[0].level = parsedOptions.loglevel;
   await assertBasePathExists(parsedOptions.outputPath);
   const loader = new SpaceObjectLoader(parsedOptions.inputDir);
   const data = await loader.loadAndValidate();
 
   await fs.promises
     .writeFile(parsedOptions.outputPath, JSON.stringify(data))
-    .describeFailure("Could not write SpaceObjects to file");
-  
-  
+    .catch(explain("Could not write SpaceObjects to file"));
 }

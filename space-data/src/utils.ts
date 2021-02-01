@@ -1,8 +1,12 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+import chalk = require("chalk");
 import * as fs from "fs";
 import * as path from "path";
-import * as winston from "winston";
+import { Logger } from "tslog";
 
-export const logger = getLogger();
+export const logger:Logger = new Logger();
 
 export async function* walkDir(
     dir: string,
@@ -31,15 +35,56 @@ export async function* walkDir(
   
 
 
-function getLogger(){
-    return winston.createLogger({
-        transports: [
-          new winston.transports.Console({
-            format: winston.format.combine(
-              winston.format.colorize(),
-              winston.format.simple()
-            ),
-          }),
-        ],
-      });
+function getErrorObject() {
+  try {
+    throw new Error("");
+  } catch (err) {
+    return err;
+  }
 }
+
+export function explain(
+  failMessage: string,
+  addOriginalError = true
+) {
+  let lexicalStack = "";
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    lexicalStack = getErrorObject().stack.split("\n").slice(3, 5).join("\n");
+  // eslint-disable-next-line no-empty
+  } catch (e) {}
+  return (err: unknown) => {
+    let originalErr;
+    if (addOriginalError) {
+      if (!err) {
+        originalErr = "";
+      } else if (err instanceof Error) {
+        originalErr = err?.stack ? err.stack : err.message;
+      } else {
+        originalErr = String(err);
+      }
+    }
+    const messages = [chalk.yellow(failMessage)];
+    if (originalErr) messages.push(originalErr);
+    if (lexicalStack) messages.push(lexicalStack);
+  
+    return Promise.reject(messages.join("\n"));
+  };
+}
+
+
+
+// function getLogger(){
+//     // return winston.createLogger({
+//     //     transports: [
+//     //       new winston.transports.Console({
+//     //         format: winston.format.combine(
+//     //           winston.format.simple(),
+
+//     //           winston.format.errors({ stack: true }),
+//     //         ),
+//     //       }),
+//     //     ],
+//     //   });
+//     return 
+// }

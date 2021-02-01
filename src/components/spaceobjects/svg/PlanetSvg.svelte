@@ -1,10 +1,10 @@
 <script lang="ts">
-  import type { Planet } from "../../../../space-data/schema/schema";
+  import type { Concept } from "../../../../space-data/schema/schema";
   import type { View } from "../../../helpers/View";
   import { bandpass } from "../../../helpers/maff";
 import { createEventDispatcher } from "svelte";
 
-  export let so: Planet;
+  export let so: Concept;
   export let view: View;
 
   const dispatch = createEventDispatcher();
