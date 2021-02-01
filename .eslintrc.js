@@ -18,6 +18,7 @@ module.exports = {
     "@typescript-eslint/no-non-null-assertion": "off",
     "@typescript-eslint/restrict-template-expressions": "off",
     "@typescript-eslint/no-floating-promises": ["error"],
+    "curly": ["error",  "multi-line"] 
   },
   plugins: ["@typescript-eslint"],
   extends: [

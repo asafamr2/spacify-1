@@ -1,6 +1,9 @@
-/* eslint-disable  */
-import type { JSONSchema7 as JSONSchema } from "json-schema";
+/* eslint-disable prefer-const */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 
+import type { JSONSchema7 as JSONSchema } from "json-schema";
 
 import * as fs from "fs";
 import * as path from "path";
@@ -13,7 +16,18 @@ const JSONSCHEMA_PROP_TO_YAML = {
   minimum: "min",
   description: "hint",
 };
-export async function JsSc2NetCMS(anyofFilterField = "type") {
+
+const FIELDS_IMPORTANCE = [
+  "title",
+  "uid",
+  "category",
+  "tags",
+  "arc",
+  "rotation",
+  "position",
+  "wiki",
+];
+export async function JsSc2NetCMS() {
   const baseYamlStr = await fs.promises
     .readFile(path.join(__dirname, "..", "config.base.yml"))
     .then((buff) => buff.toString("utf8"))
@@ -29,7 +43,7 @@ export async function JsSc2NetCMS(anyofFilterField = "type") {
     .describeFailure("Could not load jsonschema");
 
   function subschemaToConfigFormatFields(subSchema: JSONSchema) {
-    let fields = [];
+    const fields = [];
     for (let [name, definition] of Object.entries(subSchema.properties)) {
       definition = definition as JSONSchema;
       if (name.toLowerCase() === "$schema") continue;
@@ -39,8 +53,7 @@ export async function JsSc2NetCMS(anyofFilterField = "type") {
       } as Record<string, any>;
       if (definition.type === "object") {
         newProp.fields = subschemaToConfigFormatFields(definition);
-      } 
-      else if (
+      } else if (
         definition.type === "array" &&
         (definition.items as JSONSchema)?.type === "string"
       ) {
@@ -51,6 +64,13 @@ export async function JsSc2NetCMS(anyofFilterField = "type") {
       } else if (definition.type === "number") {
         newProp["value_type"] = "float";
       }
+      newProp["required"] = !!subSchema?.required?.includes(name);
+
+      if (newProp.fields) {
+        newProp["fields"].sort(
+          (x: { name: string }) => FIELDS_IMPORTANCE.indexOf(x.name) + 1 ?? 9999
+        );
+      }
 
       if (definition.pattern) {
         newProp.pattern = [
@@ -58,6 +78,7 @@ export async function JsSc2NetCMS(anyofFilterField = "type") {
           "should match REGEX " + definition.pattern,
         ];
       }
+
       for (const [jprop, yprop] of Object.entries(JSONSCHEMA_PROP_TO_YAML)) {
         if (jprop in definition) {
           newProp[yprop] = (definition as any)[jprop];
@@ -75,9 +96,13 @@ export async function JsSc2NetCMS(anyofFilterField = "type") {
     const newCollection = { ...baseCollection };
     newCollection["name"] = defStr.toLowerCase();
     newCollection["label"] = titleCase(defStr);
-    newCollection["fields"] = subschemaToConfigFormatFields(subSchema as JSONSchema);
-    newCollection["fields"]= newCollection["fields"].filter((x:any)=>x.name && x.name in ['type'])
-    
+    newCollection["fields"] = subschemaToConfigFormatFields(
+      subSchema as JSONSchema
+    );
+    newCollection["fields"] = newCollection["fields"].filter(
+      (x: any) => x?.name != "type"
+    );
+
     newCollection["fields"].push({
       label: "$schema",
       name: "$schema",
@@ -85,12 +110,8 @@ export async function JsSc2NetCMS(anyofFilterField = "type") {
       default: "../../schema/schema.json",
     });
 
-    newCollection["filter"] ={field: "type", value: newCollection.name}
-    // newCollection["fields"].push({
-    //   label: "Category",
-    //   name: "category",
-    //   widget: "string",
-    // });
+    newCollection["filter"] = { field: "type", value: newCollection.name };
+
     configYaml["collections"].push(newCollection);
     newCollection["fields"].push({
       label: "Type",
@@ -99,16 +120,20 @@ export async function JsSc2NetCMS(anyofFilterField = "type") {
       default: (subSchema as any).properties.type.enum[0],
     });
   }
-  return yaml.dump(configYaml);
+  return yaml.dump(configYaml, {
+    sortKeys: (a: string, b: string) => {
+      a = a == "name" ? "" : a;
+      b = b == "name" ? "" : b;
+      return a.localeCompare(b);
+    },
+  });
 }
-JsSc2NetCMS()
-  .then((x) =>
-    fs.promises.writeFile(
-      path.join(__dirname, "..", "..", "public", "admin", "config.yml"),
-      x
-    )
+void JsSc2NetCMS().then((x) =>
+  fs.promises.writeFile(
+    path.join(__dirname, "..", "..", "public", "admin", "config.yml"),
+    x
   )
- 
+);
 
 function titleCase(str: string) {
   return str
