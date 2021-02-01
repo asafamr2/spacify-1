@@ -1,0 +1,15 @@
+{
+"$schema": "../../schema/schema.json",
+  "type": "planet",
+  "markdown": " something",
+  "title": "asd",
+  "uid": "fsdf",
+  "position": {
+    "x": 4,
+    "y": 5
+  },
+  "category": "sdfs",
+  "tags": [
+    "ADVANCED_TOPIC"
+  ]
+}
