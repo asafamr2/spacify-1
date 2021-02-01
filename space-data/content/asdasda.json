@@ -1,7 +1,12 @@
 {
-"title": "asdasda",
+"title": "ddd",
+  "uid": "asda",
+  "category": "asda",
+  "tags": [
+    "CONCEPT"
+  ],
   "position": {
-    "x": 3,
-    "y": 3
+    "x": 2,
+    "y": 5
   }
 }
