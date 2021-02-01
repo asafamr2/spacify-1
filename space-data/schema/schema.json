@@ -25,16 +25,18 @@
                     "type": "string"
                 },
                 "category": {
+                    "description": "space region",
+                    "pattern": "^[a-z0-9\\-]*$",
                     "type": "string"
                 },
                 "child_uid": {
                     "description": "Unique and short identifier used to reference this object.",
-                    "pattern": "^[a-z0-9/]*$",
+                    "pattern": "^[a-z0-9\\-]*$",
                     "type": "string"
                 },
                 "parent_uid": {
                     "description": "Unique and short identifier used to reference this object.",
-                    "pattern": "^[a-z0-9/]*$",
+                    "pattern": "^[a-z0-9\\-]*$",
                     "type": "string"
                 },
                 "title": {
@@ -47,9 +49,14 @@
                     ],
                     "type": "string"
                 },
+                "uid": {
+                    "description": "Unique and short identifier used to reference this object.",
+                    "pattern": "^[a-z0-9\\-]*$",
+                    "type": "string"
+                },
                 "wiki": {
                     "description": "wikipedia page url",
-                    "pattern": "^https://en\\.wikipedia\\.org/.*",
+                    "pattern": "^https://en\\\\.wikipedia\\\\.org/.*",
                     "type": "string"
                 }
             },
@@ -58,7 +65,8 @@
                 "child_uid",
                 "parent_uid",
                 "title",
-                "type"
+                "type",
+                "uid"
             ],
             "type": "object"
         },
@@ -70,6 +78,8 @@
                     "type": "string"
                 },
                 "category": {
+                    "description": "space region",
+                    "pattern": "^[a-z0-9\\-]*$",
                     "type": "string"
                 },
                 "position": {
@@ -109,9 +119,14 @@
                     ],
                     "type": "string"
                 },
+                "uid": {
+                    "description": "Unique and short identifier used to reference this object.",
+                    "pattern": "^[a-z0-9\\-]*$",
+                    "type": "string"
+                },
                 "wiki": {
                     "description": "wikipedia page url",
-                    "pattern": "^https://en\\.wikipedia\\.org/.*",
+                    "pattern": "^https://en\\\\.wikipedia\\\\.org/.*",
                     "type": "string"
                 }
             },
@@ -119,7 +134,8 @@
                 "category",
                 "position",
                 "title",
-                "type"
+                "type",
+                "uid"
             ],
             "type": "object"
         },
@@ -131,11 +147,13 @@
                     "type": "string"
                 },
                 "category": {
+                    "description": "space region",
+                    "pattern": "^[a-z0-9\\-]*$",
                     "type": "string"
                 },
                 "github": {
                     "description": "github repo url",
-                    "pattern": "^https://github\\.com/.*",
+                    "pattern": "^https://github\\\\.com/.*",
                     "type": "string"
                 },
                 "position": {
@@ -179,9 +197,14 @@
                     ],
                     "type": "string"
                 },
+                "uid": {
+                    "description": "Unique and short identifier used to reference this object.",
+                    "pattern": "^[a-z0-9\\-]*$",
+                    "type": "string"
+                },
                 "wiki": {
                     "description": "wikipedia page url",
-                    "pattern": "^https://en\\.wikipedia\\.org/.*",
+                    "pattern": "^https://en\\\\.wikipedia\\\\.org/.*",
                     "type": "string"
                 }
             },
@@ -189,7 +212,8 @@
                 "category",
                 "position",
                 "title",
-                "type"
+                "type",
+                "uid"
             ],
             "type": "object"
         },
@@ -200,11 +224,13 @@
                     "type": "string"
                 },
                 "category": {
+                    "description": "space region",
+                    "pattern": "^[a-z0-9\\-]*$",
                     "type": "string"
                 },
                 "parent_uid": {
                     "description": "Unique and short identifier used to reference this object.",
-                    "pattern": "^[a-z0-9/]*$",
+                    "pattern": "^[a-z0-9\\-]*$",
                     "type": "string"
                 },
                 "title": {
@@ -217,9 +243,14 @@
                     ],
                     "type": "string"
                 },
+                "uid": {
+                    "description": "Unique and short identifier used to reference this object.",
+                    "pattern": "^[a-z0-9\\-]*$",
+                    "type": "string"
+                },
                 "wiki": {
                     "description": "wikipedia page url",
-                    "pattern": "^https://en\\.wikipedia\\.org/.*",
+                    "pattern": "^https://en\\\\.wikipedia\\\\.org/.*",
                     "type": "string"
                 }
             },
@@ -227,7 +258,8 @@
                 "category",
                 "parent_uid",
                 "title",
-                "type"
+                "type",
+                "uid"
             ],
             "type": "object"
         },
@@ -245,6 +277,8 @@
                     "type": "number"
                 },
                 "category": {
+                    "description": "space region",
+                    "pattern": "^[a-z0-9\\-]*$",
                     "type": "string"
                 },
                 "position": {
@@ -282,9 +316,14 @@
                     ],
                     "type": "string"
                 },
+                "uid": {
+                    "description": "Unique and short identifier used to reference this object.",
+                    "pattern": "^[a-z0-9\\-]*$",
+                    "type": "string"
+                },
                 "wiki": {
                     "description": "wikipedia page url",
-                    "pattern": "^https://en\\.wikipedia\\.org/.*",
+                    "pattern": "^https://en\\\\.wikipedia\\\\.org/.*",
                     "type": "string"
                 }
             },
@@ -295,7 +334,8 @@
                 "rotation",
                 "size",
                 "title",
-                "type"
+                "type",
+                "uid"
             ],
             "type": "object"
         }

@@ -10,13 +10,12 @@
   let renderCallback: () => void;
   let updateResolution: () => void;
 
-  ViewportService.getService().then(
-    vs=>vs.getViewportStore().subscribe(
-      (v) => {
-    view = v;
-    if (renderCallback) renderCallback();
-      })
-  )
+  ViewportService.getService().then((vs) =>
+    vs.getViewportStore().subscribe((v) => {
+      view = v;
+      if (renderCallback) renderCallback();
+    })
+  );
 
   let container: Element;
 
@@ -27,6 +26,21 @@
       time: { type: "f", value: 1.0 },
       resolution: { type: "v2", value: new THREE.Vector2() },
       viewvec: { type: "v4", value: new THREE.Vector4() },
+
+    //   background-color: #000000;
+    // background-color: #221036;
+    // background-color: #56548a;
+    // background-color: #a8b5ce;
+      colorsgrad: {
+        type: "v3[4]",
+        value: [
+          new THREE.Color(0x000000),
+          new THREE.Color(0x171632),
+          new THREE.Color(0x64629c),
+          new THREE.Color(0x9492Ac),
+        ],
+      },
+      colorsgradt: { type: "f[2]", value: [0.3, 0.5] },
     };
 
     const startTime = Date.now();
@@ -107,6 +121,10 @@
     left: 0;
     width: 100%;
     height: 100%;
+    /* background-color: #000000;
+    background-color: #221036;
+    background-color: #56548a;
+    background-color: #a8b5ce; */
     background-color: hsl(242, 39%, 14%);
   }
 </style>

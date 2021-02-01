@@ -24,7 +24,7 @@
   let selectedObject: SpaceObject | null = null;
   let spaceObjects: { [uid: string]: SpaceObject } = {};
 
-  fetch(`build/space_objects.json`)
+  fetch(`build/front_content.json`)
     .then((r) => r.json())
     .then((json: SpaceData) => {
       SpatialIndexService.getService().setPoints(json.spatial);

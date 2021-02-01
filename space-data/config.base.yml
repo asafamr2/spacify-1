@@ -6,12 +6,12 @@ backend:
 publish_mode: editorial_workflow
 media_library:
   name: disabled
-collections: # replaced by script
-  - name: "template" 
-    label: "Blog" 
+collections: # just for reference - replaced by script
+  - name: "planet" 
+    label: "Planet" 
     format: "json-frontmatter"
     extension: "json"
-    folder: "space_data" 
+    folder: "space-data/content" 
     path: "{{category}}/{{uid}}"
     create: true 
     fields: 

@@ -1,6 +1,9 @@
 uniform float time; 
 uniform vec2 resolution;
 uniform vec4 viewvec;
+
+uniform vec3 colorsgrad[4];
+uniform float colorsgradt[2];
 // void main()	{
 //     float x = view[0]+view[2]*gl_FragCoord.x/resolution.x;
 //     float y = view[1]+view[3]*gl_FragCoord.y/resolution.y;
@@ -75,8 +78,24 @@ void main()
 		s+=stepsize;
 	}
 
-  
-	gl_FragColor = mix(vec4(0.251, 0.149, 0.255 , 1.), vec4(112./256., 92./256.,101./256. , 1.), smoothstep(0.,80.,accumBright) );
+	vec3 fromcolor;
+	vec3 tocolor;
+	float finalt;
+	accumBright=clamp(sqrt(accumBright)/30.,0.0,1.0);
+	if(accumBright > colorsgradt[1]){
+		fromcolor = colorsgrad[2];
+		tocolor = colorsgrad[3];
+		finalt = (accumBright-colorsgradt[1]) / (1.0 -colorsgradt[1]);
+	}else if(accumBright > colorsgradt[0]){
+		fromcolor = colorsgrad[1];
+		tocolor = colorsgrad[2];
+		finalt = (accumBright-colorsgradt[0]) / (colorsgradt[1] - colorsgradt[0]);
+	}else{
+		fromcolor = colorsgrad[0];
+		tocolor = colorsgrad[1];
+		finalt = (accumBright) / (colorsgradt[0]);
+	}
+	gl_FragColor = vec4(mix(fromcolor, tocolor, finalt), 1.0);
 	// gl_FragColor.x += 0.5 +0.5* sin(uv.x);
 	// v=mix(vec3(length(v)),v,saturation); //color adjust
 	// gl_FragColor = vec4(v,1.);	

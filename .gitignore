@@ -3,4 +3,5 @@
 
 .DS_Store
 /**/*.gign.*
+/**/*.gign
 public/admin/config.yml

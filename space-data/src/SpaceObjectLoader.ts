@@ -68,13 +68,13 @@ export class SpaceObjectLoader {
     const [jsonpart, mdpart] = await Promise.resolve()
       .then(() => SpaceObjectLoader.splitJsonMd(content))
       .describeFailure("Could not splits file content: " + filePath);
-    await this.validateMd(mdpart).describeFailure(
+    const html = await this.parseMarkdown(mdpart).describeFailure(
       "Could not validate markdown: " + filePath
     );
     const so = await this.getValidatedSpaceObjectFromJson(
       jsonpart
     ).describeFailure("Could not validate jsonschema: " + filePath);
-    so.markdown = mdpart;
+    so.markdown = html;
     return so;
   }
 
@@ -161,7 +161,7 @@ export class SpaceObjectLoader {
     return Promise.reject().describeFailure(errorMessage);
   }
 
-  protected async validateMd(content: string): Promise<void> {
+  protected async parseMarkdown(content: string): Promise<string> {
     //validate everything works here - would be done in browser too
     return new Promise((resolve, reject) => {
       marked.parse(content, (err, result) => {
@@ -169,12 +169,12 @@ export class SpaceObjectLoader {
           reject(`Markdown parse error: ${err}`);
         } else {
           if (
-            result !==
+            result ===
             sanitize(result, { allowedAttributes: { "*": ["class", "id"] } })
           ) {
-            reject("Sanitizing markdown changed content");
+            resolve(result);
           } else {
-            resolve();
+            reject("Sanitizing markdown changed content");
           }
         }
       });

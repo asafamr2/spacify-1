@@ -2,7 +2,7 @@
   "name": "svelte-app",
   "version": "1.0.0",
   "scripts": {
-    "compile-space-validate-export": "ts-node --project space-data/tsconfig.json space-data/src/compile_space.ts -i space-data/objects -o public/build/space_objects.json",
+    "compile-space-validate-export": "ts-node --project space-data/tsconfig.json space-data/src/compile_space.ts -i space-data/content -o public/build/main_content.json",
     "compile-space-jsonschema": "eslint space-data && typescript-json-schema space-data/schema/schema.ts --required SpaceObject > space-data/schema/schema.json",
     "compile-space-netlifycmsschema": "ts-node --project space-data/tsconfig.json space-data/src/js2netcms.ts",
     "compile-space-full": "npm run compile-space-jsonschema && npm run compile-space-netlifycmsschema && npm run compile-space-validate-export",
@@ -14,12 +14,14 @@
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^16.0.0",
+    "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^10.0.0",
     "@rollup/plugin-typescript": "^6.0.0",
     "@tsconfig/svelte": "^1.0.0",
     "@types/hammerjs": "^2.0.36",
     "@types/jest": "^26.0.20",
     "@types/js-yaml": "^4.0.0",
+    "@types/json-schema": "^7.0.7",
     "@types/marked": "^1.2.1",
     "@types/node": "^14.14.22",
     "@types/rbush": "^3.0.0",

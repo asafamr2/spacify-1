@@ -1,5 +1,5 @@
 /* eslint-disable  */
-import type { JSONSchema } from "vscode-json-languageservice";
+import type { JSONSchema7 as JSONSchema } from "json-schema";
 
 
 import * as fs from "fs";
@@ -60,7 +60,7 @@ export async function JsSc2NetCMS(anyofFilterField = "type") {
       }
       for (const [jprop, yprop] of Object.entries(JSONSCHEMA_PROP_TO_YAML)) {
         if (jprop in definition) {
-          newProp[yprop] = jprop;
+          newProp[yprop] = (definition as any)[jprop];
         }
       }
       newProp["label"] = titleCase(newProp["name"]);
@@ -73,22 +73,25 @@ export async function JsSc2NetCMS(anyofFilterField = "type") {
     const defStr = (sub as JSONSchema).$ref.split("/").slice(-1)[0];
     const subSchema = jsonschema.definitions[defStr];
     const newCollection = { ...baseCollection };
-    newCollection["name"] = defStr;
+    newCollection["name"] = defStr.toLowerCase();
     newCollection["label"] = titleCase(defStr);
-    newCollection["fields"] = subschemaToConfigFormatFields(subSchema);
+    newCollection["fields"] = subschemaToConfigFormatFields(subSchema as JSONSchema);
+    newCollection["fields"]= newCollection["fields"].filter((x:any)=>x.name && x.name in ['type'])
+    
     newCollection["fields"].push({
       label: "$schema",
       name: "$schema",
       widget: "hidden",
-      default: "../something.json",
+      default: "../../schema/schema.json",
     });
-    newCollection["fields"].push({
-      label: "Category",
-      name: "category",
-      widget: "string",
-    });
+
+    newCollection["filter"] ={field: "type", value: newCollection.name}
+    // newCollection["fields"].push({
+    //   label: "Category",
+    //   name: "category",
+    //   widget: "string",
+    // });
     configYaml["collections"].push(newCollection);
-    newCollection["fields"]= newCollection["fields"].filter((x:any)=>x?.name !== 'type')
     newCollection["fields"].push({
       label: "Type",
       name: "type",

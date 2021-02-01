@@ -1,6 +1,6 @@
 /**
  * @description Unique and short identifier used to reference this object.
- * @pattern "^[a-z0-9\/]*$"
+ * @pattern ^[a-z0-9\-]*$
  */
 export type uid = string;
 
@@ -23,12 +23,13 @@ interface common_props {
    */
   $schema?: string;
 
-  /**
-   * @ignore
-   */
   uid: uid;
 
-  category:string;
+  /**
+   * @description space region
+   * @pattern ^[a-z0-9\-]*$
+   */
+  category: string;
 
   /**
    * @description displayed in viewport and popup
@@ -42,7 +43,7 @@ interface common_props {
 
   /**
    * @description wikipedia page url
-   * @pattern "^https://en\\.wikipedia\\.org/.*"
+   * @pattern ^https://en\\.wikipedia\\.org/.*
    */
   wiki?: string;
 }
@@ -62,7 +63,7 @@ export interface Product extends common_props, has_position {
 
   /**
    * @description github repo url
-   * @pattern "^https://github\\.com/.*"
+   * @pattern ^https://github\\.com/.*
    */
   github?: string;
 
