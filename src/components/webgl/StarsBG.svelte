@@ -27,20 +27,20 @@
       resolution: { type: "v2", value: new THREE.Vector2() },
       viewvec: { type: "v4", value: new THREE.Vector4() },
 
-    //   background-color: #000000;
-    // background-color: #221036;
-    // background-color: #56548a;
-    // background-color: #a8b5ce;
+      //   background-color: #000000;
+      // background-color: #221036;
+      // background-color: #56548a;
+      // background-color: #a8b5ce;
       colorsgrad: {
         type: "v3[4]",
         value: [
-          new THREE.Color(0x000000),
-          new THREE.Color(0x171632),
-          new THREE.Color(0x64629c),
-          new THREE.Color(0x9492Ac),
+          new THREE.Color(0x2b2b2b),
+          new THREE.Color(0x2b2b2b),
+          new THREE.Color(0x737373),
+          new THREE.Color(0x737373),
         ],
       },
-      colorsgradt: { type: "f[2]", value: [0.3, 0.5] },
+      colorsgradt: { type: "f[2]", value: [0.14, 0.9] },
     };
 
     const startTime = Date.now();
@@ -83,8 +83,8 @@
       if (renderer) {
         uniforms.time.value = (10000 * elapsedMilliseconds) / 1000;
         uniforms.viewvec.value.set(
-          (view.x + add[0]) * mul,
-          -(view.y + add[1]) * mul - view.height * mul,
+          (view.x + add[0] - view.width / 2) * mul,
+          -(view.y + add[1] + view.height / 2) * mul,
           view.width * mul,
           view.height * mul
         );

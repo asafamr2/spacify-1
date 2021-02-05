@@ -5,7 +5,6 @@
   let tags = ("tags" in so && so.tags) || [];
 </script>
 
-<div>
   <h1>{so.title}</h1>
   <dl>
     <dt>Category</dt>
@@ -31,16 +30,22 @@
       {@html so.markdown}
     {/if}
   </section>
+  <slot></slot>
 
   <footer class="edit-this">
-    <div>Edit this by a <a href="https://github.com/asafamr/spacify/tree/staging/space-data/objects/{so.uid}.json">manual pull request</a></div>
-    <div>Edit this by a <a href="/admin/#/collections">Netlify CMS pull request</a></div>
+    <div  class="quiet-text">Edit this by a <a target="_blank" href="https://github.com/asafamr/spacify/tree/staging/space-data/content/{so.category}/{so.uid}.json">manual pull request</a></div>
+    <div class="quiet-text">Edit this by a <a target="_blank" href="/admin/#/collections/{so.type}/entries/{so.category}/{so.uid}">Netlify CMS pull request</a></div>
   </footer>
-</div>
 
 <style>
+  .edit-this{
+    margin-top: auto;
+  }
+  .edit-this div{
+    padding: 0.2rem;
+  }
   h1 {
     width: 100%;
-    color: var(--header, black);
+    color: var(--header, rgb(17, 17, 17));
   }
 </style>

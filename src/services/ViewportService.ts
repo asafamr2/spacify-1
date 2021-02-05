@@ -18,8 +18,8 @@ const viewLimits: Record<string, [number, number]> = {
 };
 
 const startView = {
-  x: 0,
-  y: 0,
+  x: 500,
+  y: 500,
   width: 100,
   height: 100,
 };
@@ -45,17 +45,28 @@ export class ViewportService extends AsyncService {
   }
 
   public static Init(node: HTMLElement) {
+    const urlParams = new URLSearchParams(location.search);
+    for (const p of ["x", "y", "width"]) {
+      if (urlParams.get(p)) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        (startView as any)[p] = parseFloat(urlParams.get(p) as string);
+      }
+    }
     const vs = writable<View>(startView);
     const vn = new ViewportNode(node, vs, startView);
     return new ViewportService(vn, vs);
   }
 
-  public  getViewportStore(this:this) {
+  public getViewportStore(this: this) {
     return this._viewportStore;
   }
 
   public updateShift(selectionPos: Point | null, isHorizontal: boolean) {
     this._vn.updateShift(selectionPos, isHorizontal);
+  }
+
+  public getPositionByRelative(x: number, y: number): Point {
+    return this._vn.getPositionByRelative(x, y);
   }
 }
 
@@ -95,23 +106,31 @@ class ViewportNode {
     this.setupHammer();
     this.registerEvents();
   }
+
   public cleanup(this: this) {
     for (const cp of this.cleanups) {
       cp();
     }
+  }
+  public getPositionByRelative(x: number, y: number): Point {
+    console.log([x, y]);
+    return {
+      x: (x - 0.5) * this.currentView.width + this.currentView.x,
+      y: (y - 0.5) * this.currentView.height + this.currentView.y,
+    };
   }
   public updateShift(selectionPos: Point | null, isHorizontal: boolean) {
     const newShift: Point = { x: 0, y: 0 };
     if (selectionPos) {
       newShift.x =
         selectionPos.x -
-        this.viewGoalWithoutShift.x -
-        (isHorizontal ? 0.25 : 0.5) * this.viewGoalWithoutShift.width;
+        this.viewGoalWithoutShift.x +
+        (isHorizontal ? 0.25 : 0) * this.viewGoalWithoutShift.width;
 
       newShift.y =
         selectionPos.y -
-        this.viewGoalWithoutShift.y -
-        ((!isHorizontal ? 0.25 : 0.5) * this.viewGoalWithoutShift.width) /
+        this.viewGoalWithoutShift.y +
+        ((!isHorizontal ? 0.25 : 0) * this.viewGoalWithoutShift.width) /
           this.widthHeightRatio;
     }
 
@@ -163,8 +182,8 @@ class ViewportNode {
     scale: number
   ): View {
     const rect = this.nodeBoundingRect;
-    const relPosX = (clientX - rect.left) / rect.width;
-    const relPosY = (clientY - rect.top) / rect.height;
+    const relPosX = (clientX - rect.left) / rect.width - 0.5;
+    const relPosY = (clientY - rect.top) / rect.height - 0.5;
     const newWidth = clamp(this.viewGoalWithoutShift.width * scale, 10, 1000);
     const diff = newWidth - this.viewGoalWithoutShift.width;
     return {

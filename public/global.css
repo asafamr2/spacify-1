@@ -23,9 +23,55 @@ body {
     Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 
 }
+:root{
+  --header: hsl(214, 50%, 56%);
+  --link: rgb(0, 100, 200);
+  --link-quiet: rgb(36, 73, 110);
+  --link-visited: rgb(0, 80, 160);
 
+  /* monokai
+  /* --link-visited:#49483E; */
+  /* --link-visited: #F92672;
+  --link-visited: #A6E22E;
+  --link-visited: #FD971F;
+  --link-visited: #66D9EF;
+  --link-visited: #AE81FF;
+  --link-visited: #F8F8F2;
+  --link-visited: #737373;
+  --link-visited: #2b2b2b; */ 
+  /* #49483E
+#F92672
+#A6E22E
+#FD971F
+#66D9EF
+#AE81FF
+#A1EFE4
+#F8F8F2
+
+#75715E
+#FC5C94
+#C1F161
+#FEB257
+#8DE6F7
+#C2A1FF
+#BBF7EF */
+
+}
+
+
+button{
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 2px;
+  border: 1px solid;
+  
+}
+button.action{
+  background-color: var(--action, rgb(53, 95, 150));
+  color: var(--action-text, rgb(199, 211, 228));
+}
 a {
-  color: rgb(0, 100, 200);
+  color: var(--link);
   text-decoration: none;
 }
 
@@ -34,7 +80,14 @@ a:hover {
 }
 
 a:visited {
-  color: rgb(0, 80, 160);
+  color: var(--link-visited);
+}
+
+.quiet-text{
+  color: #666;
+}
+.quiet-text a{
+  color:  var(--link-quiet);
 }
 
 label {

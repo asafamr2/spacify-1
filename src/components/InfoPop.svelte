@@ -3,11 +3,14 @@
   import type { View } from "../helpers/View";
   import { scale } from "svelte/transition";
   import { ViewportService } from "../services/ViewportService";
+  import { SelectionManager } from "../services/SelectionManager";
   import { createEventDispatcher } from "svelte";
   import { SpaceObjectToInfoTemplate } from "./spaceobjects/mapping";
 
-  export let so: SpaceObject | null;
-  $: selectedComponent = so && SpaceObjectToInfoTemplate(so);
+  const selectionManager = SelectionManager.getService();
+  let so: SpaceObject | null = null;
+  selectionManager.selectedStore.subscribe((x) => (so = x));
+  $: selectedComponent = so &&  SpaceObjectToInfoTemplate(so)
 
   let viewportService: ViewportService | undefined;
   let currentView: View | undefined;
@@ -26,7 +29,6 @@
     viewportService = s;
     viewportService.getViewportStore().subscribe((v) => (currentView = v));
   });
-  $: so;
 </script>
 
 {#if so}
@@ -46,14 +48,17 @@
 <style>
   .info-menu {
     position: absolute;
-    display: block;
+    display: flex;
+    flex-direction: column;
     z-index: 10;
     background: #ffffffc2;
     box-shadow: 0px 0px 10px #ffffff8a, inset 0px 0px 30px #ffffff8a;
     border: 3px solid white;
     padding: 0.5rem 2rem;
     box-sizing: border-box;
+    overflow-y: auto;
   }
+
   .info-menu.horizontal {
     width: calc(50vw - 5vh);
     height: 90vh;

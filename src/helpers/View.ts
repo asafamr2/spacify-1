@@ -6,5 +6,7 @@ export interface View {
 }
 
 export function ViewToSvgBox(view: View) {
-  return `${view.x} ${view.y} ${view.width} ${view.height}`;
+  return `${view.x - view.width / 2} ${view.y - view.height / 2} ${
+    view.width
+  } ${view.height}`;
 }

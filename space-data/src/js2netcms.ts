@@ -54,6 +54,14 @@ export async function JsSc2NetCMS() {
       } as Record<string, any>;
       if (definition.type === "object") {
         newProp.fields = subschemaToConfigFormatFields(definition);
+        if (
+          newProp.fields
+            .map((x: { name: string }) => x.name)
+            .sort()
+            .toString() === "x,y"
+        ) {
+          newProp.widget = "position";
+        }
       } else if (
         definition.type === "array" &&
         (definition.items as JSONSchema)?.type === "string"
@@ -66,11 +74,14 @@ export async function JsSc2NetCMS() {
         newProp["value_type"] = "float";
       }
       newProp["required"] = !!subSchema?.required?.includes(name);
-
+      if (["x", "y", "uid", "category"].includes(newProp.name)) {
+        newProp["_widget"] = newProp["widget"];
+        newProp["widget"] = 'gettable';
+      }
       if (definition.pattern) {
         newProp.pattern = [
           definition.pattern,
-          "should match REGEX " + definition.pattern,
+          definition.pattern,
         ];
       }
 
@@ -124,8 +135,8 @@ export async function JsSc2NetCMS() {
       label: "Body",
       name: "body",
       widget: "markdown",
-      default: ' ',
-      required: true
+      default: " ",
+      required: true,
     });
 
     configYaml["collections"].push(newCollection);

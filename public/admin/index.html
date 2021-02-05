@@ -13,11 +13,101 @@
   <script src="https://unpkg.com/netlify-cms-app/dist/netlify-cms-app.js"></script>
   <script src="https://unpkg.com/netlify-auth-providers"></script>
   <script>
-      NetlifyCmsApp.registerMediaLibrary({
-        name: 'disabled',
-        init: () => ({ show: () => undefined, enableStandalone: () => false }),
-      });
-      NetlifyCmsApp.init();
+
+    const ObjectWidget = NetlifyCmsApp.getWidget('object');
+    class Position extends React.Component {
+
+      getPosFromViewport = () => {
+        const x = this?.props?.value?.get('x');
+        const y = this?.props?.value?.get('y');
+        const getParams = { chooseToCms: true };
+        if (x && y) {
+          getParams.x = parseFloat(x).toFixed(3);
+          getParams.y = parseFloat(y).toFixed(3);
+        }
+        const getParamsStr = Object.entries(getParams).map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&');
+        const viewport = window.open('/?' + getParamsStr, 'viewport');
+        const interval = setInterval(() => {
+          if (viewport.closed) {
+            clearInterval(interval);
+            const x = viewport?._viewportPosition?.x;
+            const y = viewport?._viewportPosition?.y;
+            if (x !== undefined && y !== undefined) {
+              this.setFieldValueByName('x', x.toFixed(3));
+              this.setFieldValueByName('y', y.toFixed(3));
+            }
+          }
+        }, 500);
+      };
+
+      setFieldValueByName = (name, value) => {
+        const { field, onChangeObject } = this.props;
+        for (const subfield of [...field.get('fields', [new Map()]), field.get('field', new Map())]) {
+          if (subfield.get('name') === name) {
+            setTimeout(() => onChangeObject(subfield, value));
+            return;
+          }
+        }
+      };
+
+      render = () => {
+        return React.createElement('div', { style: { position: 'relative' } }, [
+          React.createElement('button', {
+            style: {
+              margin: '7px 6px',
+              backgroundColor: 'rgb(232, 245, 254)',
+              color: 'rgb(58, 105, 199)',
+              padding: '12px',
+              border: '1px solid',
+              cursor: 'pointer',
+              fontWeight: '600',
+              borderRadius: '4px',
+              position: 'absolute',
+              right: 0,
+              zIndex: 10
+
+            }, onClick: () => this.getPosFromViewport()
+          }, ["⌖ Choose position in viewport"]),
+          React.createElement(ObjectWidget.control, this.props)
+        ]);
+      };
+    }
+
+    class Gettable extends React.Component {
+      componentDidMount = () => {
+        const name = this.props.field.get('name');
+        let queryDict = {};
+        location.search
+          .substr(1)
+          .split('&')
+          .forEach(function (item) {
+            queryDict[item.split('=')[0]] = item.split('=')[1];
+          });
+        try {
+          if (queryDict[name]) {
+            const { onChange } = this.props;
+            setTimeout(() => onChange(queryDict[name]))
+          }
+        } catch (e) {
+          console.log('could not parse get param ' + name);
+        }
+      };
+
+      render = () => {
+        const original = this.props.field.get('_widget');
+        return React.createElement(NetlifyCmsApp.getWidget(original).control, this.props);
+      };
+    }
+
+    NetlifyCmsApp.registerMediaLibrary({
+      name: 'disabled',
+      init: () => ({ show: () => undefined, enableStandalone: () => false }),
+    });
+
+    // debugger
+    NetlifyCmsApp.registerWidget("position", Position, ObjectWidget.preview, ObjectWidget.schema);
+    NetlifyCmsApp.registerWidget("gettable", Gettable);
+    NetlifyCmsApp.init();
 
   </script>
 </body>
