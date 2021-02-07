@@ -13,7 +13,7 @@ import { scale } from "svelte/transition";
   }
   function create(what: "concept" | "product") {
     window.open(
-      `/admin/?x=${x.toFixed(3)}&y=${y.toFixed(3)}#/collections/${what}/new`
+      `/admin/#/collections/${what}/new#x=${x.toFixed(3)}&y=${y.toFixed(3)}`
     );
   }
 </script>

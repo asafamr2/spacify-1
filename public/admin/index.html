@@ -77,16 +77,20 @@
       componentDidMount = () => {
         const name = this.props.field.get('name');
         let queryDict = {};
-        location.search
-          .substr(1)
-          .split('&')
-          .forEach(function (item) {
-            queryDict[item.split('=')[0]] = item.split('=')[1];
-          });
+        const spHash = location.hash.split('#');
+        if (spHash.length === 3) {
+          spHash[2].split('&')
+            .forEach(function (item) {
+              queryDict[item.split('=')[0]] = item.split('=')[1];
+            });
+        }
+       
         try {
           if (queryDict[name]) {
             const { onChange } = this.props;
-            setTimeout(() => onChange(queryDict[name]))
+            let val = queryDict[name];
+            if(this.props?.field?.get('_widget') === 'number') val =parseFloat(val);
+            setTimeout(() => onChange(val))
           }
         } catch (e) {
           console.log('could not parse get param ' + name);
