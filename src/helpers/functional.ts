@@ -25,13 +25,13 @@ export const throttle = (fn: (...whatever: any[]) => void, ms: number) => {
   };
 };
 
-export function debounce(timesec: number, callback: (...whatever: any[]) => void) {
+export function debounce(timems: number, callback: (...whatever: any[]) => void) {
   let nextCall: number | null = null;
   return (...whatever: any[]) => {
     if (nextCall !== null) {
       clearTimeout(nextCall);
     }
-    nextCall = window.setTimeout(() => callback(...whatever), timesec * 1000);
+    nextCall = window.setTimeout(() => callback(...whatever), timems);
   };
 }
 

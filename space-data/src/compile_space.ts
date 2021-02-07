@@ -1,8 +1,9 @@
 import { argv, exit } from "process";
 import { Command } from "commander";
-import { logger, assertBasePathExists,explain } from "./utils";
+import { logger, assertPathExistsEmpty as assertPathExists, explain } from "./utils";
 import { SpaceObjectLoader } from "./SpaceObjectLoader";
 import * as fs from "fs";
+import path = require("path");
 
 main(argv)
   .then(() => {
@@ -33,21 +34,43 @@ async function main(argv: string[]) {
       "-i, --input-dir <dirpath>",
       "input dir containing JSONs to walk"
     )
-    .requiredOption("-o, --output-path <filepath>", "Output JSON path");
+    .requiredOption("-o, --output-dir <dirpath>", "Output dir");
   command.parse(argv);
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const parsedOptions: {
     loglevel: string;
-    outputPath: string;
+    outputDir: string;
     inputDir: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } = command.opts() as any;
-  await assertBasePathExists(parsedOptions.outputPath);
+  await assertPathExists(parsedOptions.outputDir, true);
   const loader = new SpaceObjectLoader(parsedOptions.inputDir);
   const data = await loader.loadAndValidate();
 
   await fs.promises
-    .writeFile(parsedOptions.outputPath, JSON.stringify(data))
+    .writeFile(
+      path.join(parsedOptions.outputDir, "main_content.json"),
+      JSON.stringify(data, (k, v: any): any => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        if (v.drilldown) {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+          return { ...v, drilldown: {} };
+        }
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        return v;
+      })
+    )
     .catch(explain("Could not write SpaceObjects to file"));
+
+  for (const [fuid, val] of Object.entries(data.objects)) {
+    const fullPath = path.join(parsedOptions.outputDir, fuid + ".json");
+    if (val.drilldown) {
+      await assertPathExists(path.dirname(fullPath))
+        .then(() =>
+          fs.promises.writeFile(fullPath, JSON.stringify(val.drilldown))
+        )
+        .catch(explain("could not write drilldown for " + fuid));
+    }
+  }
 }

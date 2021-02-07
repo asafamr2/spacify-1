@@ -7,6 +7,7 @@ import RBush = require("rbush");
 import RBush_type from "rbush"; // hmm
 import type { BBox } from "rbush";
 import { SpaceData, SpatialIndex } from "../schema/data";
+import type { SpaceObject } from "../schema/schema";
 
 import {
   getLanguageService,
@@ -16,7 +17,6 @@ import {
   JSONSchema,
 } from "vscode-json-languageservice";
 import { explain, logger, walkDir } from "./utils";
-import { SpaceObject } from "../schema/schema";
 
 export class SpaceObjectLoader {
   protected jsonschema: JSONSchema = {};
@@ -73,12 +73,18 @@ export class SpaceObjectLoader {
       explain("Could not validate jsonschema: " + filePath)
     );
 
-    if (
-      !filePath.replace("\\", "/").endsWith(`${so.category}/${so.uid}.json`)
-    ) {
+    const fuid = so.category + "/" + so.uid + ".json";
+    if (!filePath.replace("\\", "/").endsWith(fuid)) {
       throw new Error("Filename should match template {category}/{uid}.json");
     }
-    if (html.trim() && "markdown" in so) so.markdown = html;
+    if (html.trim()) {
+      so.drilldown = so.drilldown ?? {
+        related: [],
+        birelated: [],
+        parsed_markdown: "",
+      };
+      so.drilldown.parsed_markdown = html.trim();
+    }
 
     return so;
   }

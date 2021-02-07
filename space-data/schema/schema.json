@@ -319,6 +319,11 @@
                     "description": "Unique and short identifier used to reference this object.",
                     "pattern": "^[a-z0-9\\-]*$",
                     "type": "string"
+                },
+                "wiki": {
+                    "description": "wikipedia page url",
+                    "pattern": "^https://en\\\\.wikipedia\\\\.org/.*",
+                    "type": "string"
                 }
             },
             "required": [

@@ -1,3 +1,4 @@
+
 /**
  * @description Unique and short identifier used to reference this object.
  * @pattern ^[a-z0-9\-]*$
@@ -5,7 +6,7 @@
 export type uid = string;
 
 type ProductTag = "CATEGORY_LEADER" | "OPEN_SOURCE" | "FREE" | "TRENDING";
-type ConceptTag = "ADVANCED_TOPIC" | "CONCERN" ;
+type ConceptTag = "ADVANCED_TOPIC" | "CONCERN";
 
 interface has_position {
   /**
@@ -16,19 +17,7 @@ interface has_position {
     y: number;
   };
 }
-interface selectable {
-   /**
-   * @ignore
-   */
-  markdown?: string;
 
-  /**
-   * @description wikipedia page url
-   * @pattern ^https://en\\.wikipedia\\.org/.*
-   */
-  wiki?: string;
-
-}
 interface common_props {
   /**
    * for json schema
@@ -48,11 +37,21 @@ interface common_props {
    */
   title: string;
 
+  /**
+   * @description wikipedia page url
+   * @pattern ^https://en\\.wikipedia\\.org/.*
+   */
+  wiki?: string;
+
+  /**
+   * @ignore
+   */
+  drilldown?: Drilldown;
 }
 /**
  * @additionalProperties false
  */
-export interface Concept extends common_props, has_position,selectable {
+export interface Concept extends common_props, has_position {
   readonly type: "concept";
   tags?: ConceptTag[];
 }
@@ -60,7 +59,7 @@ export interface Concept extends common_props, has_position,selectable {
 /**
  * @additionalProperties false
  */
-export interface Product extends common_props, has_position,selectable {
+export interface Product extends common_props, has_position {
   readonly type: "product";
 
   /**
@@ -96,15 +95,21 @@ export interface SceneText extends has_position, common_props {
   rotation: number;
 }
 
-interface Related extends common_props,selectable {
+interface Related extends common_props {
   readonly type: "related";
   parent_uid: uid;
 }
 
-interface BiRelated extends common_props,selectable {
+interface BiRelated extends common_props {
   readonly type: "birelated";
   parent_uid: uid;
   child_uid: uid;
+}
+
+export interface Drilldown {
+  parsed_markdown: string;
+  related: Related[];
+  birelated: BiRelated[];
 }
 
 export type SpaceObject = SceneText | Concept | Product | Related | BiRelated;

@@ -2,7 +2,7 @@
   "name": "svelte-app",
   "version": "1.0.0",
   "scripts": {
-    "compile-space-validate-export": "ts-node --project space-data/tsconfig.json space-data/src/compile_space.ts -i space-data/content -o public/build/main_content.json",
+    "compile-space-validate-export": "ts-node --files --project space-data/tsconfig.json space-data/src/compile_space.ts -i space-data/content -o public/build/content",
     "compile-space-jsonschema": "eslint space-data && typescript-json-schema space-data/schema/schema.ts --required SpaceObject > space-data/schema/schema.json",
     "compile-space-netlifycmsschema": "ts-node --project space-data/tsconfig.json space-data/src/js2netcms.ts",
     "compile-space-full": "run-s compile-space-jsonschema compile-space-netlifycmsschema compile-space-validate-export",
@@ -32,7 +32,7 @@
     "@types/sanitize-html": "^1.27.1",
     "@types/validator": "^13.1.3",
     "@typescript-eslint/eslint-plugin": "^4.12.0",
-    "@typescript-eslint/parser": "^4.12.0",
+    "@typescript-eslint/parser": "^4.14.2",
     "chalk": "^4.1.0",
     "commander": "^7.0.0",
     "eslint": "^7.17.0",

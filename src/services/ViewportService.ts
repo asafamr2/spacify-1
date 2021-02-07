@@ -35,6 +35,7 @@ type ViewSpring = Unexported<ViewFreeDims>["Spring"];
 // type ViewWriteable = Unexported<View>["Writable"];
 
 class _ViewportService {
+  
   protected viewportStore = writable<View>(startView);
   protected currentView: View;
   protected nodeBoundingRect: DOMRect;
@@ -108,6 +109,9 @@ class _ViewportService {
       }
     });
     this.deferred.resolve();
+  }
+  public setWidth(width: number): void {
+    this.setViewSmooth({...this.viewGoalWithoutShift,width});
   }
   async ready() {
     await this.deferred.promise;

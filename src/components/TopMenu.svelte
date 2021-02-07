@@ -10,7 +10,9 @@
   urlManager
     .getAllChangesStore()
     .subscribe(() => (hasBack = urlManager.hasBack()));
-  function help() {}
+  function help() {
+    window.focusViewportOn('meta/help',100)
+  }
   function back() {
     if (hasBack) history.back();
   }

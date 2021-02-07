@@ -2,7 +2,8 @@
 import { Readable, Writable, writable } from "svelte/store";
 import { Service } from "./Service";
 import { debounce } from "../helpers/functional";
-const LOCATION_DEBOUNCE_SECS = 1;
+const LOCATION_DEBOUNCE_SLOW_MS = 1000;
+const LOCATION_DEBOUNCE_FAST_MS = 50;
 
 function getHashParams(): Record<string, string> {
   const ret: Record<string, string> = {};
@@ -107,9 +108,10 @@ class _UrlManager {
   protected updateNow = (vals: Record<string, string>) => {
     this.updateLocationHash(vals);
   };
-  protected debouncedUpdate = debounce(LOCATION_DEBOUNCE_SECS, this.updateNow);
+  protected debouncedUpdateSlow = debounce(LOCATION_DEBOUNCE_SLOW_MS, this.updateNow);
+  protected debouncedUpdateFast = debounce(LOCATION_DEBOUNCE_FAST_MS, this.updateNow);
 
-  public update(vals: Record<string, string | null>, immediate = false) {
+  public update(vals: Record<string, string | null>, fast = false) {
     const newVals = { ...this.currentParams };
     for (const key of Object.keys(vals)) {
       if (vals[key] !== null) {
@@ -118,8 +120,8 @@ class _UrlManager {
         delete newVals[key];
       }
     }
-    if (immediate) this.updateNow(newVals);
-    else this.debouncedUpdate(newVals);
+    if (fast) this.debouncedUpdateFast(newVals);
+    else this.debouncedUpdateSlow(newVals);
   }
 }
 

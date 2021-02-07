@@ -16,6 +16,8 @@ module.exports = {
     "@typescript-eslint/no-empty-function":"off",
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-non-null-assertion": "off",
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": ["warn", {argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
     "@typescript-eslint/restrict-template-expressions": "off",
     "@typescript-eslint/no-floating-promises": ["error"],
     "curly": ["error",  "multi-line"] 
