@@ -2,8 +2,8 @@
 "$schema": "../../schema/schema.json",
   "type": "concept",
   "position": {
-    "x": "418.848",
-    "y": "565.768"
+    "x": 418.848,
+    "y": 565.768
   },
   "title": "Help",
   "uid": "help",

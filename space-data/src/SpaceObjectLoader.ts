@@ -57,26 +57,29 @@ export class SpaceObjectLoader {
 
   protected async loadFile(filePath: string) {
     if (!filePath.endsWith("json")) {
-      return Promise.reject().catch(explain(
-        "Unknown file extension for: " + filePath
-      ));
+      return Promise.reject().catch(
+        explain("Unknown file extension for: " + filePath)
+      );
     }
     const content = await this.getFileContent(filePath) //
       .catch(explain("Could not load file content: " + filePath));
     const [jsonpart, mdpart] = await Promise.resolve()
       .then(() => SpaceObjectLoader.splitJsonMd(content))
       .catch(explain("Could not splits file content: " + filePath));
-    const html = await this.parseMarkdown(mdpart).catch(explain(
-      "Could not validate markdown: " + filePath
-    ));
-    const so = await this.getValidatedSpaceObjectFromJson(
-      jsonpart
-    ).catch(explain("Could not validate jsonschema: " + filePath));
+    const html = await this.parseMarkdown(mdpart).catch(
+      explain("Could not validate markdown: " + filePath)
+    );
+    const so = await this.getValidatedSpaceObjectFromJson(jsonpart).catch(
+      explain("Could not validate jsonschema: " + filePath)
+    );
 
-    if(!filePath.replace('\\','/').endsWith(`${so.category}/${so.uid}.json`)){
-      throw new Error('Filename should match template {category}/{uid}.json')
+    if (
+      !filePath.replace("\\", "/").endsWith(`${so.category}/${so.uid}.json`)
+    ) {
+      throw new Error("Filename should match template {category}/{uid}.json");
     }
-    so.markdown = html;
+    if (html.trim() && "markdown" in so) so.markdown = html;
+
     return so;
   }
 
@@ -134,7 +137,7 @@ export class SpaceObjectLoader {
       );
 
     if (errors.length === 0) {
-      delete so.$schema;
+      if ("$schema" in so) delete so.$schema;
       return so;
     }
 
@@ -172,7 +175,9 @@ export class SpaceObjectLoader {
         } else {
           if (
             result ===
-            sanitize(result, { allowedAttributes: { "*": ["class", "id"] } })
+            sanitize(result, {
+              allowedAttributes: { "*": ["class", "id"], a: ["href"] },
+            })
           ) {
             resolve(result);
           } else {

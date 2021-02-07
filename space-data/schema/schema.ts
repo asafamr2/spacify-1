@@ -16,7 +16,19 @@ interface has_position {
     y: number;
   };
 }
+interface selectable {
+   /**
+   * @ignore
+   */
+  markdown?: string;
 
+  /**
+   * @description wikipedia page url
+   * @pattern ^https://en\\.wikipedia\\.org/.*
+   */
+  wiki?: string;
+
+}
 interface common_props {
   /**
    * for json schema
@@ -36,21 +48,11 @@ interface common_props {
    */
   title: string;
 
-  /**
-   * @ignore
-   */
-  markdown?: string;
-
-  /**
-   * @description wikipedia page url
-   * @pattern ^https://en\\.wikipedia\\.org/.*
-   */
-  wiki?: string;
 }
 /**
  * @additionalProperties false
  */
-export interface Concept extends common_props, has_position {
+export interface Concept extends common_props, has_position,selectable {
   readonly type: "concept";
   tags?: ConceptTag[];
 }
@@ -58,7 +60,7 @@ export interface Concept extends common_props, has_position {
 /**
  * @additionalProperties false
  */
-export interface Product extends common_props, has_position {
+export interface Product extends common_props, has_position,selectable {
   readonly type: "product";
 
   /**
@@ -75,7 +77,7 @@ export interface Product extends common_props, has_position {
 /**
  * @additionalProperties false
  */
-export interface SceneText extends common_props, has_position {
+export interface SceneText extends has_position, common_props {
   readonly type: "scenetext";
   size: number;
 
@@ -94,12 +96,12 @@ export interface SceneText extends common_props, has_position {
   rotation: number;
 }
 
-interface Related extends common_props {
+interface Related extends common_props,selectable {
   readonly type: "related";
   parent_uid: uid;
 }
 
-interface BiRelated extends common_props {
+interface BiRelated extends common_props,selectable {
   readonly type: "birelated";
   parent_uid: uid;
   child_uid: uid;

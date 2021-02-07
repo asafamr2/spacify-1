@@ -17,16 +17,16 @@
   </section>
 
   <section class="links">
-    {#if so.wiki}
+    {#if 'wiki' in so}
       <a href="{so.wiki}"><div class="link wiki" /></a>
     {/if}
     {#if 'github' in so}
-      <a href="{so.wiki}"><div class="link wiki" /></a>
+      <a href="{so.github}"><div class="link git" /></a>
     {/if}
   </section>
 
   <section class="md">
-    {#if so.markdown}
+    {#if 'markdown' in so}
       {@html so.markdown}
     {/if}
   </section>
