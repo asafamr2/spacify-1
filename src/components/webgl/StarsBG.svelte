@@ -10,7 +10,7 @@
   let renderCallback: () => void;
   let updateResolution: () => void;
 
-  ViewportService.getService().then((vs) =>
+  ViewportService.getAsyncInstance().then((vs) =>
     vs.getViewportStore().subscribe((v) => {
       view = v;
       if (renderCallback) renderCallback();

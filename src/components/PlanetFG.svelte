@@ -1,25 +1,25 @@
 <script lang="ts">
   import { ViewToSvgBox } from "../helpers/View";
   import type { View } from "../helpers/View";
-  import { SpatialIndexService } from "../services/SpatialIndexService";
+  import { QueryService } from "../services/QueryService";
   import type { SpaceData } from "../../space-data/schema/data";
   import { ViewportService } from "../services/ViewportService";
 
   import { SelectionManager } from "../services/SelectionManager";
   import type { SpaceObject } from "../../space-data/schema/schema";
   import { SpaceObjectToSvgComponent } from "./spaceobjects/mapping";
-  const selectionManager = SelectionManager.getService();
+  const selectionManager = SelectionManager.getInstance();
 
   let spaceObjects: { [uid: string]: SpaceObject } = {};
   let currentView: View;
-  ViewportService.getService().then((viewportService) =>
+  ViewportService.getAsyncInstance().then((viewportService) =>
     viewportService.getViewportStore().subscribe((view) => (currentView = view))
   );
 
   fetch(`build/front_content.json`)
     .then((r) => r.json())
     .then((json: SpaceData) => {
-      SpatialIndexService.getService().setPoints(json.spatial);
+      QueryService.build(json);
       spaceObjects = json.objects;
     });
 

@@ -1,7 +1,8 @@
 <script lang="ts">
   import type { SpaceObject } from "../space-data/schema/schema";
-  import type { View } from "./helpers/View";
+  // import type { View } from "./helpers/View";
   import type { PinParams } from "./helpers/interfaces";
+  import TopMenu from "./components/TopMenu.svelte";
   import InfoPop from "./components/InfoPop.svelte";
   import StarsBg from "./components/webgl/StarsBG.svelte";
   import PlanetFG from "./components/PlanetFG.svelte";
@@ -12,18 +13,21 @@
   import DroppedPin from "./components/DroppedPin.svelte";
 
   let mainElement: HTMLElement;
-  let currentView: View | null = null;
+  // let currentView: View | null = null;
 
   let pinPosRels: Point[] = [];
 
-  let viewportService: ViewportService;
+  let getPositionByRelative = (a:number,b:number)=>{return{x:a,y:b}};
 
-  onMount(async () => {
-    viewportService = ViewportService.Init(mainElement);
-    viewportService.getViewportStore().subscribe((v) => {
-      pinPosRels = [];
-      currentView = v;
+  onMount(() => {
+    ViewportService.build({node:mainElement});
+    ViewportService.getAsyncInstance().then(vs=>{
+      getPositionByRelative =vs.getPositionByRelative.bind(vs);
+      vs.getViewportStore().subscribe(() => {
+      pinPosRels = []; // removes the pin
     });
+    })
+    
   });
 
   let isChooseCms =
@@ -35,9 +39,7 @@
       return { x: 0, y: 0, relx: 0, rely: 0, isChooseCms, closests };
     const relx = pinPosRel.x;
     const rely = pinPosRel.y;
-    const { x, y } = viewportService.getPositionByRelative(relx, rely);
-
-
+    const { x, y } = getPositionByRelative(relx, rely);
     return { x, y, relx, rely, isChooseCms, closests };
   }
   function doubleClick(e: MouseEvent) {
@@ -53,17 +55,18 @@
 />
 
 <main bind:this={mainElement}>
-    {#each pinPosRels as pinPosRel (JSON.stringify(pinPosRel))}
-      <DroppedPin pinparams={getPinParams(pinPosRel)} />
-    {/each}
-    {#if isChooseCms}
-      <div class="choose-msg">
-        Double click to choose position or close tab to cancel
-      </div>
-    {/if}
-    <StarsBg />
-    <PlanetFG />
-    <InfoPop />
+  {#if isChooseCms}
+    <div class="choose-msg">
+      Double click to choose position or close tab to cancel
+    </div>
+  {/if}
+  {#each pinPosRels as pinPosRel (JSON.stringify(pinPosRel))}
+    <DroppedPin pinparams={getPinParams(pinPosRel)} />
+  {/each}
+  <TopMenu />
+  <StarsBg />
+  <PlanetFG />
+  <InfoPop />
 </main>
 
 <style>
@@ -85,8 +88,6 @@
     left: 50%;
     transform: translateX(-50%);
   }
-
-
 
   @media (min-width: 640px) {
     main {

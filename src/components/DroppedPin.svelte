@@ -7,7 +7,6 @@ import { scale } from "svelte/transition";
 
   export let pinparams: PinParams;
   const { x, y, relx, rely, closests, isChooseCms } = pinparams;
-  console.log("created pin");
   function choose() {
     (window as any)._viewportPosition = { x, y };
     window.close();

@@ -8,3 +8,7 @@ export interface PinParams {
   isChooseCms: boolean;
   closests: SpaceObject[];
 }
+
+export function SafelyUndefined<T>() {
+  return (undefined as any) as T;
+}

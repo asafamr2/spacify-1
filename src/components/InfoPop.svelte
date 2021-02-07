@@ -3,16 +3,17 @@
   import type { View } from "../helpers/View";
   import { scale } from "svelte/transition";
   import { ViewportService } from "../services/ViewportService";
+  import type { ServiceType } from "../services/Service";
   import { SelectionManager } from "../services/SelectionManager";
   import { createEventDispatcher } from "svelte";
   import { SpaceObjectToInfoTemplate } from "./spaceobjects/mapping";
 
-  const selectionManager = SelectionManager.getService();
   let so: SpaceObject | null = null;
-  selectionManager.selectedStore.subscribe((x) => (so = x));
-  $: selectedComponent = so &&  SpaceObjectToInfoTemplate(so)
 
-  let viewportService: ViewportService | undefined;
+  SelectionManager.getInstance().selectedStore.subscribe((x) => (so = x))
+  $: selectedComponent = so && SpaceObjectToInfoTemplate(so);
+
+  let viewportService: ServiceType<typeof ViewportService> | undefined;
   let currentView: View | undefined;
 
   const dispatch = createEventDispatcher();
@@ -25,7 +26,7 @@
   $: if (viewportService && isHorizontal !== undefined)
     viewportService.updateShift(selectionPos, isHorizontal);
 
-  ViewportService.getService().then((s) => {
+  ViewportService.getAsyncInstance().then((s) => {
     viewportService = s;
     viewportService.getViewportStore().subscribe((v) => (currentView = v));
   });

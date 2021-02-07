@@ -1,10 +1,12 @@
 import { spring } from "svelte/motion";
-import { writable } from "svelte/store";
+import { get, writable } from "svelte/store";
 import { clamp } from "../helpers/maff";
 import type { View } from "../helpers/View";
 import { AsyncService } from "./Service";
 import Hammer from "hammerjs";
 import type { Point } from "../helpers/Point";
+import { UrlManager } from "./UrlManager";
+import { Deferred } from "../helpers/Deferred";
 
 interface ViewFreeDims {
   x: number;
@@ -30,50 +32,11 @@ abstract class Unexported<T> {
   Writable = writable<T>({} as T);
 }
 type ViewSpring = Unexported<ViewFreeDims>["Spring"];
-type ViewWriteable = Unexported<View>["Writable"];
+// type ViewWriteable = Unexported<View>["Writable"];
 
-export class ViewportService extends AsyncService {
-  protected _vn: ViewportNode;
-  protected _viewportStore: Unexported<View>["Writable"];
-  protected constructor(
-    vn: ViewportNode,
-    viewportStore: Unexported<View>["Writable"]
-  ) {
-    super();
-    this._vn = vn;
-    this._viewportStore = viewportStore;
-  }
-
-  public static Init(node: HTMLElement) {
-    const urlParams = new URLSearchParams(location.search);
-    for (const p of ["x", "y", "width"]) {
-      if (urlParams.get(p)) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        (startView as any)[p] = parseFloat(urlParams.get(p) as string);
-      }
-    }
-    const vs = writable<View>(startView);
-    const vn = new ViewportNode(node, vs, startView);
-    return new ViewportService(vn, vs);
-  }
-
-  public getViewportStore(this: this) {
-    return this._viewportStore;
-  }
-
-  public updateShift(selectionPos: Point | null, isHorizontal: boolean) {
-    this._vn.updateShift(selectionPos, isHorizontal);
-  }
-
-  public getPositionByRelative(x: number, y: number): Point {
-    return this._vn.getPositionByRelative(x, y);
-  }
-}
-
-type Cleanup = () => void;
-
-class ViewportNode {
-  //   protected viewSpring: ViewSpring;
+class _ViewportService {
+  protected viewportStore = writable<View>(startView);
+  protected currentView: View;
   protected nodeBoundingRect: DOMRect;
   protected widthHeightRatio: number;
   protected unsubscribeCurrent: () => void = () => {};
@@ -81,20 +44,33 @@ class ViewportNode {
   protected cleanups: Cleanup[] = [];
   protected viewShift: Point = { x: 0, y: 0 };
   protected viewGoalWithoutShift: ViewFreeDims;
-  public constructor(
-    protected node: HTMLElement,
-    protected viewportStore: ViewWriteable,
-    protected currentView: View
-  ) {
-    this.viewGoalWithoutShift = currentView;
-    this.nodeBoundingRect = node.getBoundingClientRect();
+
+  protected deferred = new Deferred<void>();
+
+  constructor(args: { node: HTMLElement }) {
+    const urlManager = UrlManager.getInstance();
+    const locationHashchanges = urlManager.getOutsideChangesStore();
+
+    const initialParams = get(urlManager.getOutsideChangesStore());
+
+    this.currentView = { ...startView };
+    // const urlParams = new URLSearchParams(location.search);
+    for (const p of ["x", "y", "width"]) {
+      if (initialParams[p]) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        (this.currentView as any)[p] = parseFloat(initialParams[p]);
+      }
+    }
+
+    this.viewGoalWithoutShift = this.currentView;
+    this.nodeBoundingRect = args.node.getBoundingClientRect();
     this.widthHeightRatio =
       this.nodeBoundingRect.width / this.nodeBoundingRect.height;
     this.viewSpring = spring<ViewFreeDims>(
       {
-        x: currentView.x,
-        y: currentView.y,
-        width: currentView.width,
+        x: this.currentView.x,
+        y: this.currentView.y,
+        width: this.currentView.width,
       },
       { stiffness: 0.2, damping: 0.7 }
     );
@@ -103,17 +79,49 @@ class ViewportNode {
       this.viewportStore.set(this.currentView);
     });
     this.cleanups.push(unsubscribeCurrent);
-    this.setupHammer();
-    this.registerEvents();
-  }
+    this.setupHammer(args.node);
+    this.registerEvents(args.node);
 
+    // update changes in location and add to history
+    this.viewportStore.subscribe(({ x, y, width }) =>
+      urlManager.update({
+        x: x.toFixed(2),
+        y: y.toFixed(2),
+        width: width.toFixed(2),
+      })
+    );
+
+    // going back/forward in history changes viewport
+    locationHashchanges.subscribe((newParams) => {
+      if (newParams !== initialParams) {
+        if (
+          newParams.x !== undefined &&
+          newParams.y !== undefined &&
+          newParams.width !== undefined
+        ) {
+          this.setViewSmooth({
+            x: parseFloat(newParams.x),
+            y: parseFloat(newParams.y),
+            width: parseFloat(newParams.width),
+          });
+        }
+      }
+    });
+    this.deferred.resolve();
+  }
+  async ready() {
+    await this.deferred.promise;
+  }
   public cleanup(this: this) {
     for (const cp of this.cleanups) {
       cp();
     }
   }
+  public getViewportStore(this: this) {
+    return this.viewportStore;
+  }
+
   public getPositionByRelative(x: number, y: number): Point {
-    console.log([x, y]);
     return {
       x: (x - 0.5) * this.currentView.width + this.currentView.x,
       y: (y - 0.5) * this.currentView.height + this.currentView.y,
@@ -142,20 +150,20 @@ class ViewportNode {
       this.setViewSmooth(this.viewGoalWithoutShift);
     }
   }
-  protected registerEvents(this: this) {
+  protected registerEvents(this: this, node: HTMLElement) {
     const lwheel = (e: WheelEvent) => this.onWheel(e);
-    const lresize = this.onResize.bind(this);
-    this.node.addEventListener("wheel", lwheel);
-    this.node.addEventListener("resize", lresize);
+    const lresize = () => this.onResize(node);
+    node.addEventListener("wheel", lwheel);
+    node.addEventListener("resize", lresize);
     window.addEventListener("resize", lresize);
     this.cleanups.push(() => {
-      this.node.removeEventListener("wheel", lwheel);
-      this.node.removeEventListener("resize", lresize);
+      node.removeEventListener("wheel", lwheel);
+      node.removeEventListener("resize", lresize);
       window.removeEventListener("resize", lresize);
     });
   }
 
-  protected setViewSmooth(this: this, v: ViewFreeDims) {
+  public setViewSmooth(this: this, v: ViewFreeDims) {
     if (
       v.x < viewLimits.x[0] ||
       v.x + v.width > viewLimits.x[1] ||
@@ -194,11 +202,12 @@ class ViewportNode {
     };
   }
 
-  protected setupHammer(this: this) {
-    const mc = new Hammer(this.node);
+  protected setupHammer(this: this, node: HTMLElement) {
+    const mc = new Hammer(node);
     this.cleanups.push(() => mc.destroy());
     const pinch = new Hammer.Pinch();
     const pan = new Hammer.Pan();
+
     // pinch.recognizeWith(pan);
     // for now they are mutually exclusive
     mc.add([pinch, pan]);
@@ -234,8 +243,8 @@ class ViewportNode {
       });
     });
   }
-  protected onResize(this: this) {
-    this.nodeBoundingRect = this.node.getBoundingClientRect();
+  protected onResize(this: this, node: HTMLElement) {
+    this.nodeBoundingRect = node.getBoundingClientRect();
     this.widthHeightRatio =
       this.nodeBoundingRect.width / this.nodeBoundingRect.height;
     this.setViewSmooth({
@@ -268,3 +277,8 @@ class ViewportNode {
     event.preventDefault();
   }
 }
+
+type Cleanup = () => void;
+
+
+export const ViewportService = AsyncService.from(_ViewportService);

@@ -1,12 +1,13 @@
 /***
+ *  a mix between throttle and debounce
+ *
  *  if not called in the last ms
  *     call immediately
- *  if called in the last ms
- *    if not scheduled, scheduled
+ *  else
+ *    if not scheduled, schedule
  *    else ignore
- */ 
-// eslint-disable-next-line @typescript-eslint/ban-types
-export const throttle = (fn: Function, ms: number) => {
+ */
+export const throttle = (fn: (...whatever: any[]) => void, ms: number) => {
   let state = 0; // 0 == run now, 1 == schedule in ms, 2 ignore
   return function (...args: any[]) {
     if (state === 0) {
@@ -14,7 +15,7 @@ export const throttle = (fn: Function, ms: number) => {
       fn(...args);
       window.setTimeout(() => state--, ms);
     } else if (state == 1) {
-      state+=2;
+      state += 2;
       window.setTimeout(() => {
         state--;
         fn(...args);
@@ -24,7 +25,15 @@ export const throttle = (fn: Function, ms: number) => {
   };
 };
 
-
+export function debounce(timesec: number, callback: (...whatever: any[]) => void) {
+  let nextCall: number | null = null;
+  return (...whatever: any[]) => {
+    if (nextCall !== null) {
+      clearTimeout(nextCall);
+    }
+    nextCall = window.setTimeout(() => callback(...whatever), timesec * 1000);
+  };
+}
 
 // type HasKeys<O> = {
 //   [P in keyof O]: O[P] extends (first: any, ...args: infer H) => any
@@ -51,7 +60,6 @@ export const throttle = (fn: Function, ms: number) => {
 //     },
 //   };
 // }
-
 
 // type FunctionTypedRet<T> = (...args: any[]) => T;
 
