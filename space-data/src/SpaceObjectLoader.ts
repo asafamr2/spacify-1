@@ -42,6 +42,7 @@ export class SpaceObjectLoader {
         .then((res) => {
           spaceObjects[this.pathToUid(filePath)] = res;
         })
+        .catch(explain("Error thrown while processing " + filePath))
         .catch((err) => errors.push(err));
     }
 
