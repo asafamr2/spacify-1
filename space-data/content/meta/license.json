@@ -1,0 +1,16 @@
+{
+"$schema": "../../schema/schema.json",
+  "type": "concept",
+  "position": {
+    "x": 410.244,
+    "y": 570.611
+  },
+  "title": "License & Contribution",
+  "uid": "license",
+  "category": "meta"
+}
+Both data and app code are open source under MIT license.
+
+Contributions are very welcome!
+
+Github repo link:...
