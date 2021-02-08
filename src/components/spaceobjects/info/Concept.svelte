@@ -8,4 +8,4 @@
 <style>
     
 </style>
-<Common {so} >concept</Common>
+<Common {so} ></Common>

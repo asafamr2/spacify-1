@@ -12,7 +12,6 @@
   import type { Point } from "./helpers/Point";
   import DroppedPin from "./components/DroppedPin.svelte";
 
-  let mainElement: HTMLElement;
   // let currentView: View | null = null;
 
   let pinPosRels: Point[] = [];
@@ -20,7 +19,6 @@
   let getPositionByRelative = (a:number,b:number)=>{return{x:a,y:b}};
 
   onMount(() => {
-    ViewportService.build({node:mainElement});
     ViewportService.getAsyncInstance().then(vs=>{
       getPositionByRelative =vs.getPositionByRelative.bind(vs);
       vs.getViewportStore().subscribe(() => {
@@ -54,7 +52,7 @@
   on:dblclick={doubleClick}
 />
 
-<main bind:this={mainElement}>
+<main >
   {#if isChooseCms}
     <div class="choose-msg">
       Double click to choose position or close tab to cancel
@@ -78,8 +76,6 @@
   }
   .choose-msg {
     z-index: 20;
-    color: var(--highlight-plus, white);
-    background-color: var(--box, gray);
     border-radius: 10px;
     padding: 10px;
     position: absolute;
@@ -87,8 +83,10 @@
     top: 2rem;
     left: 50%;
     transform: translateX(-50%);
+    color: var(--highlight-plus, white);
+  background-color: var(--box, gray);
   }
-
+ 
   @media (min-width: 640px) {
     main {
       max-width: none;

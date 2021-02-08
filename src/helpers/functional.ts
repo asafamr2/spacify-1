@@ -27,12 +27,19 @@ export const throttle = (fn: (...whatever: any[]) => void, ms: number) => {
 
 export function debounce(timems: number, callback: (...whatever: any[]) => void) {
   let nextCall: number | null = null;
-  return (...whatever: any[]) => {
+  const f = (...whatever: any[]) => {
     if (nextCall !== null) {
       clearTimeout(nextCall);
     }
     nextCall = window.setTimeout(() => callback(...whatever), timems);
   };
+  f.immediately=(...whatever: any[])=>{
+    if (nextCall !== null) {
+      clearTimeout(nextCall);
+    }
+    callback(...whatever)
+  }
+  return f;
 }
 
 // type HasKeys<O> = {

@@ -7,13 +7,14 @@
   import { SpaceObjectToSvgComponent } from "./spaceobjects/mapping";
   import { throttle } from "../helpers/functional";
   import { QueryService } from "../services/QueryService";
+import { SafelyUndefined } from "../helpers/interfaces";
+import { onMount } from "svelte";
   const selectionManager = SelectionManager.getInstance();
-
+  const selStore = selectionManager.selectedStore;
   let spaceObjectsInView: [
     SpaceObject,
     ReturnType<typeof SpaceObjectToSvgComponent>
   ][] = [];
-
   let updating = false;
   const throttledUpdateView = throttle((view: View) => {
     if (updating) return;
@@ -32,6 +33,12 @@
       .finally(() => (updating = false));
   }, 100);
 
+  let viewController=SafelyUndefined<HTMLElement>();
+    onMount(()=>{
+      ViewportService.build({node:viewController});
+    })
+  
+
   let currentView: View;
   ViewportService.getAsyncInstance().then((viewportService) =>
     viewportService.getViewportStore().subscribe((view) => {
@@ -41,24 +48,36 @@
   );
 </script>
 
-{#if currentView}
-  <svg
-    class="svgboard"
-    viewBox={ViewToSvgBox(currentView)}
-    on:click|self={() => selectionManager.unset()}
-  >
-    {#each spaceObjectsInView as so (so[0].category + "/" + so[0].uid)}
-      <svelte:component
-        this={so[1]}
-        so={so[0]}
-        view={currentView}
-        on:select={() => selectionManager.set(so[0])}
-      />
-    {/each}
-  </svg>
-{/if}
+
+
+
+<div class='main' bind:this={viewController}>
+  {#if currentView}
+    <svg
+      class="svgboard"
+      viewBox={ViewToSvgBox(currentView)}
+      on:click|self={() => selectionManager.unset()}
+    >
+      {#each spaceObjectsInView as so (so[0].category + "/" + so[0].uid)}
+        <svelte:component
+          this={so[1]}
+          so={so[0]}
+          isSelected={$selStore === so[0]}
+          on:select={() => selectionManager.set(so[0])}
+        />
+      {/each}
+    </svg>
+  {/if}
+</div>
 
 <style>
+  .main{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
   .svgboard {
     position: absolute;
     top: 0;

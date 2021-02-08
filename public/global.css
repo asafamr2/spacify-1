@@ -29,9 +29,16 @@ body {
   --link-quiet: rgb(36, 73, 110);
   --link-visited: rgb(0, 80, 160);
 
+  --menu-highlight:#A6E22E;
+
+  --planet-concept-hl: hsl(50, 80%, 80%);
+  --planet-concept-dark: #FD971F;
+
+  --planet-product-hl: #ded0f7;
+  --planet-product-dark:#AE81FF;
   /* monokai
   /* --link-visited:#49483E; */
-  /* --link-visited: #F92672;
+   --link-visited: #F92672;
   --link-visited: #A6E22E;
   --link-visited: #FD971F;
   --link-visited: #66D9EF;
@@ -129,3 +136,4 @@ button:not(:disabled):active {
 button:focus {
   border-color: #666;
 }
+

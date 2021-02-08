@@ -2,8 +2,12 @@
 import { Readable, Writable, writable } from "svelte/store";
 import { Service } from "./Service";
 import { debounce } from "../helpers/functional";
-const LOCATION_DEBOUNCE_SLOW_MS = 1000;
-const LOCATION_DEBOUNCE_FAST_MS = 50;
+import { ViewportService } from "./ViewportService";
+import { SelectionManager } from "./SelectionManager";
+import { QueryService } from "./QueryService";
+import type { SpaceObject } from "../../space-data/schema/schema";
+
+const LOCATION_DEBOUNCE_MS = 1000;
 
 function getHashParams(): Record<string, string> {
   const ret: Record<string, string> = {};
@@ -20,24 +24,27 @@ function getHashParams(): Record<string, string> {
   return ret;
 }
 
+type UrlParams = { selected?: string; x?: string; y?: string; width?: string };
 type StateParams = {
-  params: Record<string, string>;
+  params: UrlParams;
   revision: number;
 };
-function shallowEq(obj1: Record<string, string>, obj2: Record<string, string>) {
+function shallowEq(
+  obj1: Record<string, string | undefined>,
+  obj2: Record<string, string | undefined>
+) {
   return (
     Object.entries(obj1).sort().toString() ===
     Object.entries(obj2).sort().toString()
   );
 }
-
-
-
+function getFuid(so: SpaceObject) {
+  return so.category + "/" + so.uid;
+}
 
 class _UrlManager {
-  protected currentParams: Record<string, string>;
-  protected locationOutsideUpdates: Writable<Record<string, string>>;
-  protected locationAllUpdates: Writable<Record<string, string>>;
+  protected currentParams: UrlParams;
+  protected locationUpdates: Writable<UrlParams>;
   protected revision = 0;
 
   public hasBack() {
@@ -45,30 +52,75 @@ class _UrlManager {
   }
 
   constructor() {
-    this.currentParams = getHashParams();
+    this.currentParams = getHashParams() as UrlParams;
     if (Object.keys(this.currentParams).length > 0) {
-      this.revision++;
+      this.revision++; // if we started with hash params we can go back to the first load
     }
-    this.locationOutsideUpdates = writable<Record<string, string>>(
-      this.currentParams
-    );
-    this.locationAllUpdates = writable<Record<string, string>>(
-      this.currentParams
-    );
+    this.updateViewport();
+    this.locationUpdates = writable<UrlParams>(this.currentParams);
+
+    void ViewportService.getAsyncInstance().then((vs) => {
+      vs.getViewportStore().subscribe((newView) => {
+        if (this.currentParams.selected) return;
+        this.debouncedUpdate({
+          x: newView.x.toFixed(2),
+          y: newView.y.toFixed(2),
+          width: newView.width.toFixed(2),
+        });
+      });
+    });
+
+    SelectionManager.getInstance().selectedStore.subscribe((selected) => {
+      if (
+        (selected === null && this?.currentParams?.selected) || // unselection
+        (selected !== null &&
+          getFuid(selected) !== this?.currentParams?.selected)
+      ) {
+        this.debouncedUpdate.immediately({
+          ...this.currentParams,
+          selected: selected === null ? undefined : getFuid(selected),
+        });
+      }
+    });
 
     window.addEventListener(
       "popstate",
       (e: PopStateEvent) => {
         const state = e.state as StateParams;
-        const params = state?.params ?? getHashParams();
+        const params = state?.params ?? (getHashParams() as UrlParams);
         const revision = state?.revision ?? 0;
         this.revision = revision;
         this.currentParams = params;
-        this.locationOutsideUpdates.set(params);
-        this.locationAllUpdates.set(params);
+        this.locationUpdates.set(params);
+
+        void QueryService.getAsyncInstance().then((qs) =>
+          SelectionManager.getInstance().set(
+            params.selected ? qs.getSpaceObjectByUid(params.selected) : null
+          )
+        );
+
+        this.updateViewport();
       },
       false
     );
+  }
+  protected updateViewport() {
+    if (
+      (this.currentParams.x && this.currentParams.y) ||
+      this.currentParams.width
+    ) {
+      void ViewportService.getAsyncInstance().then((vs) => {
+        if (this.currentParams.x && this.currentParams.y) {
+          vs.moveTo({
+            x: parseFloat(this.currentParams.x),
+            y: parseFloat(this.currentParams.y),
+          });
+        }
+        if (this.currentParams.width) {
+          vs.setWidth(parseFloat(this.currentParams.width));
+        }
+      });
+    }
   }
 
   protected filterKeys(obj: Record<string, string>, keys: string[]) {
@@ -86,6 +138,7 @@ class _UrlManager {
   protected updateLocationHash(obj: Record<string, string>) {
     if (shallowEq(obj, this.currentParams)) return;
     const hash = Object.entries(obj)
+      .filter(([_, val]) => val)
       .map(([key, val]) => encodeURI(key) + "=" + encodeURI(val))
       .join("&");
     this.currentParams = obj;
@@ -95,34 +148,36 @@ class _UrlManager {
       "",
       "#" + hash
     );
-    this.locationAllUpdates.set(obj);
+    this.locationUpdates.set(obj);
   }
 
-  getOutsideChangesStore(): Readable<Record<string, string>> {
-    return this.locationOutsideUpdates as Readable<Record<string, string>>;
-  }
-  getAllChangesStore(): Readable<Record<string, string>> {
-    return this.locationAllUpdates as Readable<Record<string, string>>;
+  // getOutsideChangesStore(): Readable<Record<string, string>> {
+  //   return this.locationOutsideUpdates as Readable<Record<string, string>>;
+  // }
+  getChangesStore(): Readable<UrlParams> {
+    return this.locationUpdates as Readable<UrlParams>;
   }
 
-  protected updateNow = (vals: Record<string, string>) => {
-    this.updateLocationHash(vals);
-  };
-  protected debouncedUpdateSlow = debounce(LOCATION_DEBOUNCE_SLOW_MS, this.updateNow);
-  protected debouncedUpdateFast = debounce(LOCATION_DEBOUNCE_FAST_MS, this.updateNow);
-
-  public update(vals: Record<string, string | null>, fast = false) {
-    const newVals = { ...this.currentParams };
-    for (const key of Object.keys(vals)) {
-      if (vals[key] !== null) {
-        newVals[key] = vals[key] as string;
-      } else {
-        delete newVals[key];
-      }
+  protected debouncedUpdate = debounce(
+    LOCATION_DEBOUNCE_MS,
+    (vals: UrlParams) => {
+      this.updateLocationHash(vals as Record<string, string>);
     }
-    if (fast) this.debouncedUpdateFast(newVals);
-    else this.debouncedUpdateSlow(newVals);
-  }
+  );
+
+  // public update(vals: Record<string, string | null>, fast = false) {
+  //   console.log('upd',new Error(''))
+  //   const newVals = { ...this.currentParams };
+  //   for (const key of Object.keys(vals)) {
+  //     if (vals[key] !== null) {
+  //       newVals[key] = vals[key] as string;
+  //     } else {
+  //       delete newVals[key];
+  //     }
+  //   }
+  //   if (fast) this.debouncedUpdateFast(newVals);
+  //   else this.debouncedUpdateSlow(newVals);
+  // }
 }
 
 export const UrlManager = Service.from(_UrlManager);

@@ -18,7 +18,6 @@
 
   const dispatch = createEventDispatcher();
 
-  // $: console.log(selected)
   $: isHorizontal = currentView && currentView.width > currentView.height;
 
   $: selectionPos = (so && "position" in so && so.position) || null;
@@ -33,7 +32,7 @@
 </script>
 
 {#if so}
-  <div
+  <div 
     class="info-menu"
     class:horizontal={isHorizontal}
     class:vertical={!isHorizontal}

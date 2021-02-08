@@ -1,11 +1,10 @@
 import { spring } from "svelte/motion";
-import { get, writable } from "svelte/store";
+import { writable } from "svelte/store";
 import { clamp } from "../helpers/maff";
 import type { View } from "../helpers/View";
 import { AsyncService } from "./Service";
 import Hammer from "hammerjs";
 import type { Point } from "../helpers/Point";
-import { UrlManager } from "./UrlManager";
 import { Deferred } from "../helpers/Deferred";
 
 interface ViewFreeDims {
@@ -13,7 +12,7 @@ interface ViewFreeDims {
   y: number;
   width: number;
 }
-const viewLimits: Record<string, [number, number]> = {
+const viewLimits:{[k:string]:[number,number]}= {
   x: [-100, 1000],
   y: [-100, 1000],
   width: [10, 1000],
@@ -35,7 +34,6 @@ type ViewSpring = Unexported<ViewFreeDims>["Spring"];
 // type ViewWriteable = Unexported<View>["Writable"];
 
 class _ViewportService {
-  
   protected viewportStore = writable<View>(startView);
   protected currentView: View;
   protected nodeBoundingRect: DOMRect;
@@ -49,19 +47,19 @@ class _ViewportService {
   protected deferred = new Deferred<void>();
 
   constructor(args: { node: HTMLElement }) {
-    const urlManager = UrlManager.getInstance();
-    const locationHashchanges = urlManager.getOutsideChangesStore();
+    // const urlManager = UrlManager.getInstance();
 
-    const initialParams = get(urlManager.getOutsideChangesStore());
+    // const initialParams = get(urlManager.getChangesStore());
 
     this.currentView = { ...startView };
     // const urlParams = new URLSearchParams(location.search);
-    for (const p of ["x", "y", "width"]) {
-      if (initialParams[p]) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        (this.currentView as any)[p] = parseFloat(initialParams[p]);
-      }
-    }
+    // if (initialParams.x)this.currentView.x=parseFloat(initialParams.x)
+    // for (const p of ["x", "y", "width"]) {
+    //    {
+    //     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    //     (this.currentView as any)[p] = parseFloat(initialParams[p]);
+    //   }
+    // }
 
     this.viewGoalWithoutShift = this.currentView;
     this.nodeBoundingRect = args.node.getBoundingClientRect();
@@ -76,7 +74,8 @@ class _ViewportService {
       { stiffness: 0.2, damping: 0.7 }
     );
     const unsubscribeCurrent = this.viewSpring.subscribe(({ x, y, width }) => {
-      this.currentView = { x, y, width, height: width / this.widthHeightRatio };
+      const width_clamped = clamp(width,...viewLimits.width)
+      this.currentView = { x, y, width:width_clamped, height: width_clamped / this.widthHeightRatio };
       this.viewportStore.set(this.currentView);
     });
     this.cleanups.push(unsubscribeCurrent);
@@ -84,34 +83,18 @@ class _ViewportService {
     this.registerEvents(args.node);
 
     // update changes in location and add to history
-    this.viewportStore.subscribe(({ x, y, width }) =>
-      urlManager.update({
-        x: x.toFixed(2),
-        y: y.toFixed(2),
-        width: width.toFixed(2),
-      })
-    );
+    // this.viewportStore.subscribe(({ x, y, width }) =>
+    //   urlManager.update({
+    //     x: x.toFixed(2),
+    //     y: y.toFixed(2),
+    //     width: width.toFixed(2),
+    //   })
+    // );
 
-    // going back/forward in history changes viewport
-    locationHashchanges.subscribe((newParams) => {
-      if (newParams !== initialParams) {
-        if (
-          newParams.x !== undefined &&
-          newParams.y !== undefined &&
-          newParams.width !== undefined
-        ) {
-          this.setViewSmooth({
-            x: parseFloat(newParams.x),
-            y: parseFloat(newParams.y),
-            width: parseFloat(newParams.width),
-          });
-        }
-      }
-    });
     this.deferred.resolve();
   }
   public setWidth(width: number): void {
-    this.setViewSmooth({...this.viewGoalWithoutShift,width});
+    this.setViewSmooth({ ...this.viewGoalWithoutShift, width });
   }
   async ready() {
     await this.deferred.promise;
@@ -130,6 +113,9 @@ class _ViewportService {
       x: (x - 0.5) * this.currentView.width + this.currentView.x,
       y: (y - 0.5) * this.currentView.height + this.currentView.y,
     };
+  }
+  public moveTo(p: Point) {
+    this.setViewSmooth({ width: this.viewGoalWithoutShift.width, ...p });
   }
   public updateShift(selectionPos: Point | null, isHorizontal: boolean) {
     const newShift: Point = { x: 0, y: 0 };
@@ -167,7 +153,7 @@ class _ViewportService {
     });
   }
 
-  public setViewSmooth(this: this, v: ViewFreeDims) {
+  protected setViewSmooth(this: this, v: ViewFreeDims) {
     if (
       v.x < viewLimits.x[0] ||
       v.x + v.width > viewLimits.x[1] ||
@@ -176,6 +162,7 @@ class _ViewportService {
     ) {
       return;
     }
+
     this.viewGoalWithoutShift = v;
     void this.viewSpring.set(
       {
@@ -230,6 +217,7 @@ class _ViewportService {
     });
     mc.on("panmove pinchmove", (ev) => {
       if (!beforeMoveView) return;
+      ev.target.nodeType
       this.viewShift = { x: 0, y: 0 };
       let pxToUnit = beforeMoveView.width / this.nodeBoundingRect.width;
       if (ev.type === "pinchmove") {
@@ -283,6 +271,5 @@ class _ViewportService {
 }
 
 type Cleanup = () => void;
-
 
 export const ViewportService = AsyncService.from(_ViewportService);
