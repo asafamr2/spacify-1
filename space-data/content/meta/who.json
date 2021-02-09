@@ -1,0 +1,12 @@
+{
+"position": {
+    "x": 422.673,
+    "y": 562.303
+  },
+  "$schema": "../../schema/schema.json",
+  "type": "concept",
+  "title": "Who made this?",
+  "uid": "who",
+  "category": "meta"
+}
+[Asaf Amrami](https://github.com/asafamr/) made this.
