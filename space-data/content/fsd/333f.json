@@ -1,6 +1,6 @@
 {
 "position": {
-    "x": "100",
+    "x": 100,
     "y": 45
   },
   "$schema": "../../schema/schema.json",
