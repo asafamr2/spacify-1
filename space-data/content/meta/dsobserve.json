@@ -10,10 +10,11 @@
   "category": "meta",
   "tags": ["FREE", "OPEN_SOURCE"]
 }
-# Data* Observatory
 
-Data* (star) Observatory is the fancy website you are currently viewing. 
+Data* (star) Observatory is the fancy website you are currently viewing.
+
 Its goal: to help [software architects](https://en.wikipedia.org/wiki/Software_architect) quickly catch up with latest [DB-related](https://en.wikipedia.org/wiki/Database) tech.
-The navigable main visually map software (orange planets) and technical concepts (purple planets) which are put into areas according to topic.
+
+The navigable main visually maps software (orange planets) and technical concepts (purple planets) into areas of different topics.
 Clicking on such a planet will reveal a short description, list of related entities and directions for further research.
 

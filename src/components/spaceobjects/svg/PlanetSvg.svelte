@@ -1,7 +1,8 @@
 <script context="module" type="ts">
   // context=module means this is added once
   let svgGrads = "<svg>";
-  for (const ptype of ["concept", "planet"]) {
+
+  for (const ptype of ["concept", "product"]) {
     svgGrads += `<radialGradient id="grad-${ptype}" cx="25%" cy="25%" r="60%">
       <stop offset="0%"
         style="stop-color:var(--planet-${ptype}-hl, white);stop-opacity:1"

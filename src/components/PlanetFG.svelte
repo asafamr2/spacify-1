@@ -71,6 +71,7 @@ import { onMount } from "svelte";
 </div>
 
 <style>
+  
   .main{
     position: absolute;
     top: 0;
@@ -79,6 +80,7 @@ import { onMount } from "svelte";
     height: 100%;
   }
   .svgboard {
+    font-family: monospace;
     position: absolute;
     top: 0;
     left: 0;

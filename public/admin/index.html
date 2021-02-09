@@ -33,8 +33,8 @@
             const x = viewport?._viewportPosition?.x;
             const y = viewport?._viewportPosition?.y;
             if (x !== undefined && y !== undefined) {
-              this.setFieldValueByName('x', x.toFixed(3));
-              this.setFieldValueByName('y', y.toFixed(3));
+              this.setFieldValueByName('x', parseFloat(x.toFixed(3)));
+              this.setFieldValueByName('y', parseFloat(y.toFixed(3)));
             }
           }
         }, 500);
@@ -73,35 +73,6 @@
       };
     }
 
-    class Gettable extends React.Component {
-      componentDidMount = () => {
-        const name = this.props.field.get('name');
-        let queryDict = {};
-        const spHash = location.hash.split('#');
-        if (spHash.length === 3) {
-          spHash[2].split('&')
-            .forEach(function (item) {
-              queryDict[item.split('=')[0]] = item.split('=')[1];
-            });
-        }
-       
-        try {
-          if (queryDict[name]) {
-            const { onChange } = this.props;
-            let val = queryDict[name];
-            if(this.props?.field?.get('_widget') === 'number') val =parseFloat(val);
-            setTimeout(() => onChange(val))
-          }
-        } catch (e) {
-          console.log('could not parse get param ' + name);
-        }
-      };
-
-      render = () => {
-        const original = this.props.field.get('_widget');
-        return React.createElement(NetlifyCmsApp.getWidget(original).control, this.props);
-      };
-    }
 
     NetlifyCmsApp.registerMediaLibrary({
       name: 'disabled',
@@ -109,7 +80,6 @@
     });
 
     NetlifyCmsApp.registerWidget("position", Position, ObjectWidget.preview, ObjectWidget.schema);
-    NetlifyCmsApp.registerWidget("gettable", Gettable);
     NetlifyCmsApp.init();
 
   </script>

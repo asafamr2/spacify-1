@@ -74,10 +74,6 @@ export async function JsSc2NetCMS() {
         newProp["value_type"] = "float";
       }
       newProp["required"] = !!subSchema?.required?.includes(name);
-      if (["x", "y", "uid", "category"].includes(newProp.name)) {
-        newProp["_widget"] = newProp["widget"];
-        newProp["widget"] = 'gettable';
-      }
       if (definition.pattern) {
         newProp.pattern = [
           definition.pattern,
@@ -136,7 +132,7 @@ export async function JsSc2NetCMS() {
       name: "body",
       widget: "markdown",
       default: " ",
-      required: true,
+      required: false,
     });
 
     configYaml["collections"].push(newCollection);

@@ -13,18 +13,18 @@ import { scale } from "svelte/transition";
   }
   function create(what: "concept" | "product") {
     window.open(
-      `/admin/#/collections/${what}/new#x=${x.toFixed(3)}&y=${y.toFixed(3)}`
+      `/admin/#/collections/${what}/new?position.x=${x.toFixed(3)}&position.y=${y.toFixed(3)}`
     );
   }
 </script>
 
 <div transition:scale={{duration:100}} class="pin" style="left: {relx * 100}%; top: {rely * 100}%">
-  <div>X,Y: ({x.toFixed(2)}, {y.toFixed(2)})</div>
+  <div>X: {x.toFixed(2)}  ,Y: {y.toFixed(2)}</div>
   <div>
     Closests objects:
     <ul>
       {#each closests as so}
-        {so.uid}/{so.uid}
+        <li >{so.category}/{so.uid}</li>
       {/each}
     </ul>
   </div>

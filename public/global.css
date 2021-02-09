@@ -36,16 +36,18 @@ body {
 
   --planet-product-hl: #ded0f7;
   --planet-product-dark:#AE81FF;
+
+  --scene-text: #A6E22E;
   /* monokai
   /* --link-visited:#49483E; */
-   --link-visited: #F92672;
+   /* --link-visited: #F92672;
   --link-visited: #A6E22E;
   --link-visited: #FD971F;
   --link-visited: #66D9EF;
   --link-visited: #AE81FF;
   --link-visited: #F8F8F2;
   --link-visited: #737373;
-  --link-visited: #2b2b2b; */ 
+  --link-visited: #2b2b2b; */  
   /* #49483E
 #F92672
 #A6E22E

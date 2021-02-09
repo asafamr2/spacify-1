@@ -12,10 +12,10 @@
 </script>
 
 <h1>{so.title}</h1>
-<dl>
+<!-- <dl>
   <dt>Category</dt>
   <dl>{so.category}</dl>
-</dl>
+</dl> -->
 <section class="tags">
   {#each tags as tag}
     <div class="tag {tag}" />

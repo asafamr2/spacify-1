@@ -15,7 +15,9 @@ class _SelectionManager {
 
     window._dsoSelect = (fuid: string, width?: number) => {
       void QueryService.getAsyncInstance().then((qs) =>
-        this.set(qs.getSpaceObjectByUid(fuid) ?? null)
+        {const so =qs.getSpaceObjectByUid(fuid);
+          if(fuid && !so)console.error('Could not find planet '+fuid)
+        this.set(so ?? null)}
       );
       if (width) {
         void ViewportService.getAsyncInstance().then((vs) =>

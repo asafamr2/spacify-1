@@ -11,16 +11,16 @@
   import { ViewportService } from "./services/ViewportService";
   import type { Point } from "./helpers/Point";
   import DroppedPin from "./components/DroppedPin.svelte";
+import { QueryService } from "./services/QueryService";
 
   // let currentView: View | null = null;
 
-  let pinPosRels: Point[] = [];
+  let pinPosRels: PinParams[] = [];
 
   let getPositionByRelative = (a:number,b:number)=>{return{x:a,y:b}};
 
   onMount(() => {
     ViewportService.getAsyncInstance().then(vs=>{
-      getPositionByRelative =vs.getPositionByRelative.bind(vs);
       vs.getViewportStore().subscribe(() => {
       pinPosRels = []; // removes the pin
     });
@@ -31,25 +31,21 @@
   let isChooseCms =
     location.search.includes("chooseToCms=true") && window.opener;
 
-  function getPinParams(pinPosRel: Point): PinParams {
-    const closests: SpaceObject[] = [];
-    if (!pinPosRel)
-      return { x: 0, y: 0, relx: 0, rely: 0, isChooseCms, closests };
-    const relx = pinPosRel.x;
-    const rely = pinPosRel.y;
-    const { x, y } = getPositionByRelative(relx, rely);
-    return { x, y, relx, rely, isChooseCms, closests };
-  }
-  function doubleClick(e: MouseEvent) {
+  async function putPin(e: MouseEvent) {
     const relx = e.clientX / window.innerWidth;
     const rely = e.clientY / window.innerHeight;
-    pinPosRels = [{ x: relx, y: rely }];
+    const { x, y } = await ViewportService.getAsyncInstance().then(vs=>vs.getPositionByRelative(relx,rely))
+    const  closests = await QueryService.getAsyncInstance().then(
+      qs=>qs.getClosest(x,y,3)
+    )
+    pinPosRels = [{ x, y, relx, rely, isChooseCms, closests }];
   }
 </script>
 
 <svelte:window
   on:contextmenu|capture|stopPropagation|preventDefault={() => false}
-  on:dblclick={doubleClick}
+  on:dblclick={putPin}
+  on:click={()=>pinPosRels =[]}
 />
 
 <main >
@@ -59,7 +55,7 @@
     </div>
   {/if}
   {#each pinPosRels as pinPosRel (JSON.stringify(pinPosRel))}
-    <DroppedPin pinparams={getPinParams(pinPosRel)} />
+    <DroppedPin pinparams={pinPosRel} />
   {/each}
   <TopMenu />
   <StarsBg />

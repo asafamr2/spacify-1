@@ -11,7 +11,7 @@
     .getChangesStore()
     .subscribe(() => (hasBack = urlManager.hasBack()));
   function help() {
-    window._dsoSelect("meta/help", 100);
+    window._dsoSelect("meta/dsobserve", 100);
   }
   function back() {
     if (hasBack) history.back();

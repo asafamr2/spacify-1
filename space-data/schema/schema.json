@@ -177,9 +177,9 @@
                 "tags": {
                     "items": {
                         "enum": [
-                            "CATEGORY_LEADER",
                             "FREE",
                             "OPEN_SOURCE",
+                            "POPULAR",
                             "TRENDING"
                         ],
                         "type": "string"

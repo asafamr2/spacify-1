@@ -2,14 +2,14 @@
 "size": 20,
   "$schema": "../../schema/schema.json",
   "position": {
-    "x": "411.056",
-    "y": "565.470"
+    "x": 411.056,
+    "y": 565.470
   },
   "uid": "text-meta-nebula",
-  "arc": 0.2,
+  "arc": 0.05,
   "title": "Meta Nebula",
   "type": "scenetext",
   "category": "meta",
-  "rotation": -20
+  "rotation": -35
 }
   

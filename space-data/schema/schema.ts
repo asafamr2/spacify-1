@@ -5,7 +5,7 @@
  */
 export type uid = string;
 
-type ProductTag = "CATEGORY_LEADER" | "OPEN_SOURCE" | "FREE" | "TRENDING";
+type ProductTag = "POPULAR"  | "OPEN_SOURCE" | "FREE" | "TRENDING";
 type ConceptTag = "ADVANCED_TOPIC" | "CONCERN";
 
 interface has_position {
