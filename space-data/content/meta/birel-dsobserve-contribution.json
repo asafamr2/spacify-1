@@ -1,0 +1,10 @@
+{
+"$schema": "../../schema/schema.json",
+  "type": "birelated",
+  "category": "meta",
+  "uid": "birel-dsobserve-contribution",
+  "parent_uid": "meta/dsobserve",
+  "child_uid": "meta/contribution",
+  "title": "Contribute"
+}
+ 
