@@ -1,0 +1,11 @@
+{
+"$schema": "../../schema/schema.json",
+  "type": "concept",
+  "title": "test",
+  "uid": "4dsdf",
+  "position": {
+    "x": 414.158,
+    "y": 554.031
+  },
+  "category": "meta"
+}
