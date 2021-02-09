@@ -1,0 +1,24 @@
+{
+"position": {
+    "x": 420.255,
+    "y": 571.125
+  },
+  "$schema": "../../schema/schema.json",
+  "type": "concept",
+  "title": "Webapp stack & thanks",
+  "uid": "stack",
+  "category": "meta"
+}
+This webapp is powered by [Svelte](https://svelte.dev)
+
+programmed in [TypeScript](https://www.typescriptlang.org)
+
+Running on [Netlify](https://www.netlify.com)
+
+Source (and data) is on [Github](https://github.com/asafamr/spacify)
+
+Managing data in GitHub is nicely done using [Netlify CMS](https://www.netlifycms.org/)
+
+Monokai color scheme by Wimer Hazenberg
+
+Stars background shader by Pablo Roman Andrioli
