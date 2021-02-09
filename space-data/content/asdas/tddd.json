@@ -1,11 +1,11 @@
 {
 "position": {
-    "x": "100",
+    "x": 100,
     "y": 33
   },
   "$schema": "../../schema/schema.json",
   "type": "concept",
-  "title": "asda",
+  "title": "new title",
   "uid": "tddd",
   "category": "asdas"
 }
