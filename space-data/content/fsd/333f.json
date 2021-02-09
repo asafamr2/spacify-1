@@ -1,0 +1,11 @@
+{
+"position": {
+    "x": "100",
+    "y": 45
+  },
+  "$schema": "../../schema/schema.json",
+  "type": "concept",
+  "title": "asd",
+  "uid": "333f",
+  "category": "fsd"
+}
