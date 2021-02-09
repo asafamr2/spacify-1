@@ -2,7 +2,7 @@
 "$schema": "../../schema/schema.json",
   "type": "concept",
   "position": {
-    "x": 410.24,
+    "x": 410.2,
     "y": 570.611
   },
   "title": "License",
