@@ -1,0 +1,18 @@
+{
+"position": {
+    "x": 405.868,
+    "y": 559.203
+  },
+  "$schema": "../../schema/schema.json",
+  "type": "concept",
+  "title": "Contribution",
+  "uid": "contribution",
+  "category": "meta"
+}
+Contribution to data* obs. is very welcome!
+
+You can easily create revisions and add new items (i.e planets) through the Netlify CMS GUI (link below).
+
+Note that any contribution is published under the MIT license of the project.
+
+Contributions should be in English, should be short and informative for quick exploration and should provide links for deeper understanding.
