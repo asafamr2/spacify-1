@@ -1,0 +1,15 @@
+{
+"size": 40,
+  "$schema": "../../schema/schema.json",
+  "position": {
+    "x": 517.361,
+    "y": 508.205
+  },
+  "uid": "text-consistency-availability",
+  "arc": 0.05,
+  "title": "⇠ Consistency | Availability ⇢",
+  "type": "scenetext",
+  "category": "cap",
+  "rotation": 27
+}
+ 
